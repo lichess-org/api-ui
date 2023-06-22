@@ -1,19 +1,24 @@
-import { Ctrl } from './ctrl';
+import { App } from './app';
 import page from 'page';
+import { Home } from './page/home';
+import { Pairing } from './page/pairing';
 
-export default function (ctrl: Ctrl) {
+export default function (app: App) {
   page.base(BASE_PATH);
-  page('/', async ctx => {
+  page('/', ctx => {
     if (ctx.querystring.includes('code=liu_')) history.pushState({}, '', BASE_PATH || '/');
-    ctrl.openHome();
+    new Home(app).redraw();
   });
   page('/login', async _ => {
-    if (ctrl.auth.me) return page('/');
-    await ctrl.auth.login();
+    if (app.auth.me) return page('/');
+    await app.auth.login();
   });
   page('/logout', async _ => {
-    await ctrl.auth.logout();
+    await app.auth.logout();
     location.href = BASE_PATH;
+  });
+  page('/endpoint/pairing', _ => {
+    new Pairing(app).redraw();
   });
   page({ hashbang: true });
 }

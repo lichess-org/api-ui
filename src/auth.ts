@@ -3,8 +3,8 @@ import { BASE_PATH } from './routing';
 
 // export const lichessHost = 'https://lichess.org';
 export const lichessHost = 'http://l.org';
-export const scopes = ['web:login'];
-export const clientId = 'lichess-api-demo';
+export const scopes = ['challenge:write', 'web:mod'];
+export const clientId = 'lichess-api-ui';
 export const clientUrl = `${location.protocol}//${location.host}${BASE_PATH || '/'}`;
 
 export interface Me {

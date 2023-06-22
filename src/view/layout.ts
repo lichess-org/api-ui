@@ -1,16 +1,16 @@
 import { h, VNode } from 'snabbdom';
 import { Me } from '../auth';
-import { Ctrl } from '../ctrl';
+import { App } from '../app';
 import { MaybeVNodes } from '../interfaces';
 import { href } from '../routing';
 import '../../scss/_navbar.scss';
 
-export default function (ctrl: Ctrl, body: MaybeVNodes): VNode {
-  return h('body', [renderNavBar(ctrl), h('div.container', body)]);
+export default function (app: App, body: MaybeVNodes): VNode {
+  return h('body', [renderNavBar(app), h('div.container', body)]);
 }
 
-const renderNavBar = (ctrl: Ctrl) =>
-  h('header.navbar.navbar-expand-md.navbar-dark.bg-dark', [
+const renderNavBar = (app: App) =>
+  h('header.navbar.navbar-expand-md.bg-body-tertiary', [
     h('div.container', [
       h(
         'a.navbar-brand',
@@ -35,8 +35,47 @@ const renderNavBar = (ctrl: Ctrl) =>
       ),
       h('div#navbarSupportedContent.collapse.navbar-collapse', [
         h('ul.navbar-nav.me-auto.mb-lg-0"', []),
-        h('ul.navbar-nav', [ctrl.auth.me ? userNav(ctrl.auth.me) : anonNav()]),
+        app.auth.me ? endpointNav() : null,
+        h('ul.navbar-nav', [app.auth.me ? userNav(app.auth.me) : anonNav()]),
       ]),
+    ]),
+  ]);
+
+const endpointNav = () =>
+  h('ul.navbar-nav', [
+    h('li.nav-item.dropdown', [
+      h(
+        'a#navbarDropdown.nav-link.dropdown-toggle',
+        {
+          attrs: {
+            href: '#',
+            role: 'button',
+            'data-bs-toggle': 'dropdown',
+            'aria-expanded': false,
+          },
+        },
+        'Endpoints'
+      ),
+      h(
+        'ul.dropdown-menu',
+        {
+          attrs: {
+            'aria-labelledby': 'navbarDropdown',
+          },
+        },
+        [
+          h(
+            'li',
+            h(
+              'a.dropdown-item',
+              {
+                attrs: href('/endpoint/pairing'),
+              },
+              'Pair 2 players'
+            )
+          ),
+        ]
+      ),
     ]),
   ]);
 
