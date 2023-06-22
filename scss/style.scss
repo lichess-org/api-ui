@@ -1,0 +1,25 @@
+@import './bootstrap';
+@import './navbar';
+
+.login {
+  .about {
+    margin: 10vh 10vw;
+  }
+  .big {
+    font-size: 2rem;
+  }
+  & .btn {
+    font-size: 3rem;
+  }
+}
+
+.about {
+  text-align: left;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
