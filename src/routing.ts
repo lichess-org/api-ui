@@ -1,7 +1,8 @@
 import { App } from './app';
 import page from 'page';
 import { Home } from './page/home';
-import { Pairing } from './page/pairing';
+import { BulkPairing } from './page/bulk';
+import { NotFound } from './page/notFound';
 
 export default function (app: App) {
   page.base(BASE_PATH);
@@ -17,9 +18,12 @@ export default function (app: App) {
     await app.auth.logout();
     location.href = BASE_PATH;
   });
-  page('/endpoint/pairing', _ => {
-    if (app.auth.me) new Pairing(app, app.auth.me).redraw();
+  page('/endpoint/bulk', _ => {
+    if (app.auth.me) new BulkPairing(app, app.auth.me).redraw();
     else page('/login');
+  });
+  page('*', _ => {
+    new NotFound(app).redraw();
   });
   page({ hashbang: true });
 }

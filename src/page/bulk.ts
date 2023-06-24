@@ -20,7 +20,7 @@ interface Result {
   startClocksAt: number;
 }
 
-export class Pairing {
+export class BulkPairing {
   feedback: form.Feedback<Result> = undefined;
   lichessUrl: string;
   constructor(readonly app: App, readonly me: Me) {
@@ -202,6 +202,7 @@ export class Pairing {
   renderResult = (result: Result) =>
     h('div.card.mb-5', [
       h('div.card-body', [
+        h('h2.card-title', ['Bulk #', result.id]),
         h('p.lead', [
           'Game scheduled at: ',
           result.pairAt ? timeFormat(new Date(result.pairAt)) : 'Now',

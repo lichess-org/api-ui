@@ -69,9 +69,9 @@ const endpointNav = () =>
             h(
               'a.dropdown-item',
               {
-                attrs: href('/endpoint/pairing'),
+                attrs: href('/endpoint/bulk'),
               },
-              'Pair 2 players'
+              'Schedule games'
             )
           ),
         ]
