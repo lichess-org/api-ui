@@ -134,17 +134,13 @@ export class BulkPairing {
         form.isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : null,
         h('div.mb-3', [
           form.label('Players', 'players'),
-          h(
-            'textarea.form-control',
-            {
-              attrs: {
-                name: 'players',
-                style: 'height: 100px',
-                required: true,
-              },
+          h('textarea.form-control', {
+            attrs: {
+              name: 'players',
+              style: 'height: 100px',
+              required: true,
             },
-            'lizen50 lizen51'
-          ),
+          }),
           h('p.form-text', [
             'Two usernames per line, each line is a game.',
             h('br'),
