@@ -26,7 +26,7 @@ export default args => ({
     commonjs(),
     scss({
       include: ['scss/*'],
-      fileName: args['config-prod'] ? 'dist/style.min.css' : 'style.css',
+      fileName: args['config-prod'] ? 'style.min.css' : 'style.css',
       runtime: sass,
       ...(args['config-prod'] ? { outputStyle: 'compressed' } : {}),
     }),
