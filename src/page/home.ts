@@ -13,10 +13,14 @@ export class Home {
 
   listEndpoints = () =>
     h('div.list-group.mb-7', [
-      h('a.list-group-item.list-group-item-action', { attrs: href('/endpoint/bulk') }, [
+      h('a.list-group-item.list-group-item-action', { attrs: href('/endpoint/schedule-games') }, [
         h('h3', 'Schedule games'),
         h('span', 'Requires Lichess admin permissions'),
       ]),
+      // h('a.list-group-item.list-group-item-action', { attrs: href('/endpoint/open-challenge') }, [
+      //   h('h3', 'Open challenge'),
+      //   h('span', 'Create a game that any two players can join'),
+      // ]),
     ]);
 
   anonHome = () => [

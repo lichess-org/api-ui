@@ -2,9 +2,10 @@ import { App } from '../app';
 import { h } from 'snabbdom';
 import layout from '../view/layout';
 import * as form from '../view/form';
-import { formData, variants } from '../util';
+import { variants } from '../util';
 import { Me } from '../auth';
 import { timeFormat } from '../view/util';
+import { Feedback, formData, isFailure, isSuccess } from '../form';
 
 interface Tokens {
   [username: string]: string;
@@ -20,8 +21,8 @@ interface Result {
   startClocksAt: number;
 }
 
-export class BulkPairing {
-  feedback: form.Feedback<Result> = undefined;
+export class ScheduleGames {
+  feedback: Feedback<Result> = undefined;
   lichessUrl: string;
   constructor(readonly app: App, readonly me: Me) {
     this.lichessUrl = app.config.lichessHost;
@@ -31,7 +32,7 @@ export class BulkPairing {
     layout(
       this.app,
       h('div', [
-        h('h1.mt-5', 'Bulk pairing'),
+        h('h1.mt-5', 'Schedule games'),
         h('p.lead', [
           'Uses the ',
           h(
@@ -46,7 +47,7 @@ export class BulkPairing {
           h('strong', 'API Challenge admin'),
           ' permission to generate the player challenge tokens automatically.',
         ]),
-        this.renderForm(form.isSuccess(this.feedback) ? this.feedback.result.id : undefined),
+        this.renderForm(isSuccess(this.feedback) ? this.feedback.result.id : undefined),
       ])
     );
 
@@ -104,7 +105,7 @@ export class BulkPairing {
     } catch (err) {
       this.feedback = {
         message: JSON.stringify(err),
-      } as form.Failure;
+      };
     }
     this.redraw();
   };
@@ -134,12 +135,12 @@ export class BulkPairing {
         },
       },
       [
-        form.isSuccess(this.feedback)
+        isSuccess(this.feedback)
           ? h('div.alert.alert-success', 'Games scheduled!')
-          : form.isFailure(this.feedback)
+          : isFailure(this.feedback)
           ? h('div.alert.alert-danger', this.feedback.message)
           : null,
-        form.isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : null,
+        isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : null,
         h('div.mb-3', [
           form.label('Players', 'players'),
           h(`textarea.form-control.${lastBulkId || 'bulk-new'}`, {

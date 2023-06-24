@@ -1,8 +1,7 @@
 import { App } from './app';
 import page from 'page';
 import { Home } from './page/home';
-import { BulkPairing } from './page/bulk';
-import { Common } from './page/common';
+import { ScheduleGames } from './page/scheduleGames';
 
 export default function (app: App) {
   page.base(BASE_PATH);
@@ -18,12 +17,16 @@ export default function (app: App) {
     await app.auth.logout();
     location.href = BASE_PATH;
   });
-  page('/endpoint/bulk', _ => {
-    if (app.auth.me) new BulkPairing(app, app.auth.me).redraw();
+  // page('/endpoint/open-challenge', _ => {
+  //   if (app.auth.me) new OpenChallenge(app, app.auth.me).redraw();
+  //   else page('/login');
+  // });
+  page('/endpoint/schedule-games', _ => {
+    if (app.auth.me) new ScheduleGames(app, app.auth.me).redraw();
     else page('/login');
   });
-  page('/too-many-requests', _ => new Common(app).tooManyRequests());
-  page('*', _ => new Common(app).notFound());
+  page('/too-many-requests', _ => app.tooManyRequests());
+  page('*', _ => app.notFound());
   page({ hashbang: true });
 }
 
