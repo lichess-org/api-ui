@@ -24,6 +24,13 @@
   min-height: 70vh;
 }
 
+.navbar-brand {
+  .lichess-logo-white {
+    opacity: 0.8;
+    max-height: 30px;
+  }
+}
+
 .bd-footer {
   a {
     color: var(--bs-body-color);
