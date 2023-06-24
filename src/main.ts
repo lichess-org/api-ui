@@ -5,12 +5,16 @@ import '../scss/style.scss';
 import '../node_modules/bootstrap/js/dist/dropdown.js';
 import '../node_modules/bootstrap/js/dist/collapse.js';
 import routing from './routing';
-import { App } from './app';
+import { App, Config } from './app';
+
+const config: Config = {
+  lichessHost: 'http://l.org',
+};
 
 export default async function (element: HTMLElement) {
   const patch = init([attributesModule, eventListenersModule, classModule]);
 
-  const app = new App(redraw);
+  const app = new App(config, redraw);
 
   let vnode = patch(element, loadingBody());
 

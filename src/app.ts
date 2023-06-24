@@ -1,8 +1,14 @@
 import { Auth } from './auth';
 import { Redraw } from './interfaces';
 
-export class App {
-  auth: Auth = new Auth();
+export interface Config {
+  lichessHost: string;
+}
 
-  constructor(readonly redraw: Redraw) {}
+export class App {
+  auth: Auth;
+
+  constructor(readonly config: Config, readonly redraw: Redraw) {
+    this.auth = new Auth(config.lichessHost);
+  }
 }

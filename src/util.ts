@@ -1,3 +1,5 @@
+import { Me } from './auth';
+
 export const formData = (data: any): FormData => {
   const formData = new FormData();
   for (const k of Object.keys(data)) formData.append(k, data[k]);
@@ -17,3 +19,8 @@ export const variants = [
   ['horde', 'Horde'],
   ['racingKings', 'RacingKing'],
 ];
+
+async function request<TResponse>(url: string, config: RequestInit, me: Me): Promise<TResponse> {
+  const response = await fetch(url, config);
+  return await response.json();
+}

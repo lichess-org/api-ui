@@ -18,7 +18,7 @@ export default function (app: App) {
     location.href = BASE_PATH;
   });
   page('/endpoint/pairing', _ => {
-    if (app.auth.me) new Pairing(app).redraw();
+    if (app.auth.me) new Pairing(app, app.auth.me).redraw();
     else page('/login');
   });
   page({ hashbang: true });

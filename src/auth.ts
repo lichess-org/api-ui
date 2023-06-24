@@ -1,11 +1,11 @@
-import { HttpClient, OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
+import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
 import { BASE_PATH } from './routing';
 
-// export const lichessHost = 'https://lichess.org';
-export const lichessHost = 'http://l.org';
 export const scopes = ['challenge:write', 'web:mod'];
 export const clientId = 'lichess-api-ui';
 export const clientUrl = `${location.protocol}//${location.host}${BASE_PATH || '/'}`;
+
+type HttpClient = (url: string, options?: RequestInit) => Promise<Response>;
 
 export interface Me {
   id: string;
@@ -14,9 +14,10 @@ export interface Me {
 }
 
 export class Auth {
+  constructor(readonly lichessHost: string) {}
   oauth = new OAuth2AuthCodePKCE({
-    authorizationUrl: `${lichessHost}/oauth`,
-    tokenUrl: `${lichessHost}/api/token`,
+    authorizationUrl: `${this.lichessHost}/oauth`,
+    tokenUrl: `${this.lichessHost}/api/token`,
     clientId,
     scopes,
     redirectUrl: clientUrl,
@@ -47,35 +48,19 @@ export class Auth {
   }
 
   async logout() {
-    if (this.me) await this.me.httpClient(`${lichessHost}/api/token`, { method: 'DELETE' });
+    if (this.me) await this.me.httpClient(`${this.lichessHost}/api/token`, { method: 'DELETE' });
     localStorage.clear();
     this.me = undefined;
   }
 
   private authenticate = async () => {
     const httpClient = this.oauth.decorateFetchHTTPClient(window.fetch);
-    const res = await httpClient(`${lichessHost}/api/account`);
+    const res = await httpClient(`${this.lichessHost}/api/account`);
     const me = {
       ...(await res.json()),
       httpClient,
     };
     if (me.error) throw me.error;
     this.me = me;
-  };
-
-  fetchBody = async (path: string, config: any = {}) => {
-    const res = await this.fetchResponse(path, config);
-    const body = await res.json();
-    return body;
-  };
-
-  private fetchResponse = async (path: string, config: any = {}) => {
-    const res = await (this.me?.httpClient || window.fetch)(`${lichessHost}${path}`, config);
-    if (res.error || !res.ok) {
-      const err = `${res.error} ${res.status} ${res.statusText}`;
-      alert(err);
-      throw err;
-    }
-    return res;
   };
 }
