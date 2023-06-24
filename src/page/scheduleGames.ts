@@ -1,11 +1,11 @@
-import { App } from '../app';
 import { h } from 'snabbdom';
-import layout from '../view/layout';
-import * as form from '../view/form';
-import { variants } from '../util';
+import { App } from '../app';
 import { Me } from '../auth';
-import { timeFormat } from '../view/util';
-import { Feedback, formData, isFailure, isSuccess } from '../form';
+import { Feedback, formData, isSuccess } from '../form';
+import { gameRules } from '../util';
+import * as form from '../view/form';
+import layout from '../view/layout';
+import { card, timeFormat } from '../view/util';
 
 interface Tokens {
   [username: string]: string;
@@ -82,9 +82,7 @@ export class ScheduleGames {
             })
             .sort(sortFn) as [string, string]
       );
-      const rules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin', 'noEarlyDraw'].filter(
-        key => !!get(key)
-      );
+      const rules = gameRules.filter(key => !!get(key));
       // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
       const res = await this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
         method: 'POST',
@@ -124,100 +122,62 @@ export class ScheduleGames {
   };
 
   private renderForm = (lastBulkId?: string) =>
-    h(
-      'form.mt-5',
-      {
-        on: {
-          submit: (e: Event) => {
-            e.preventDefault();
-            this.onSubmit(new FormData(e.target as HTMLFormElement));
+    form.form(this.onSubmit, [
+      form.feedback(this.feedback),
+      isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
+      h('div.mb-3', [
+        form.label('Players', 'players'),
+        h(`textarea.form-control.${lastBulkId || 'bulk-new'}`, {
+          attrs: {
+            name: 'players',
+            style: 'height: 100px',
+            required: true,
           },
-        },
-      },
-      [
-        isSuccess(this.feedback)
-          ? h('div.alert.alert-success', 'Games scheduled!')
-          : isFailure(this.feedback)
-          ? h('div.alert.alert-danger', this.feedback.message)
-          : null,
-        isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : null,
-        h('div.mb-3', [
-          form.label('Players', 'players'),
-          h(`textarea.form-control.${lastBulkId || 'bulk-new'}`, {
-            attrs: {
-              name: 'players',
-              style: 'height: 100px',
-              required: true,
-            },
-          }),
-          h('p.form-text', [
-            'Two usernames per line, each line is a game.',
-            h('br'),
-            'First username gets the white pieces, unless randomized by the switch below.',
-          ]),
+        }),
+        h('p.form-text', [
+          'Two usernames per line, each line is a game.',
+          h('br'),
+          'First username gets the white pieces, unless randomized by the switch below.',
         ]),
-        h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
-        h('div.mb-3', [
-          form.label('Clock'),
-          h('div.input-group', [
-            form.input('clockLimit', { tpe: 'number', placeholder: 'Initial time in minutes' }),
-            h('span.input-group-text', '+'),
-            form.input('clockIncrement', { tpe: 'number', placeholder: 'Increment in seconds' }),
-          ]),
+      ]),
+      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+      form.clock(),
+      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
+      form.variant(),
+      form.specialRules(),
+      h('div.mb-3', [
+        form.label('When to create the games', 'pairAt'),
+        h('input#pairAt.form-control', {
+          attrs: {
+            type: 'datetime-local',
+            name: 'pairAt',
+          },
+        }),
+        h('p.form-text', 'Leave empty to create the games immediately'),
+      ]),
+      h('div.mb-3', [
+        form.label('When to start the clocks', 'startClocksAt'),
+        h('input#startClocksAt.form-control', {
+          attrs: {
+            type: 'datetime-local',
+            name: 'startClocksAt',
+          },
+        }),
+        h('p.form-text', [
+          'Date at which the clocks will be automatically started.',
+          h('br'),
+          'Note that the clocks can start earlier than specified, if players start making moves in the game.',
+          h('br'),
+          'Leave empty so that the clocks only start when players make moves.',
         ]),
-        h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
-        h('div.mb-3', [
-          form.label('Variant', 'variant'),
-          h(
-            'select.form-select',
-            { attrs: { name: 'variant' } },
-            variants.map(([key, name]) => form.selectOption(key, name))
-          ),
-        ]),
-        h('div.mb-3', [
-          h('div', form.label('Special rules', 'rules')),
-          ...[
-            ['noAbort', 'Players cannot abort the game'],
-            ['noRematch', 'Players cannot offer a rematch'],
-            ['noGiveTime', 'Players cannot give extra time'],
-            ['noClaimWin', 'Players cannot claim the win if the opponent leaves'],
-            ['noEarlyDraw', 'Players cannot offer a draw before move 30 (ply 60)'],
-          ].map(([key, label]) => h('div.form-check.form-switch.mb-1', form.checkboxWithLabel(key, label))),
-        ]),
-        h('div.mb-3', [
-          form.label('When to create the games', 'pairAt'),
-          h('input#pairAt.form-control', {
-            attrs: {
-              type: 'datetime-local',
-              name: 'pairAt',
-            },
-          }),
-          h('p.form-text', 'Leave empty to create the games immediately'),
-        ]),
-        h('div.mb-3', [
-          form.label('When to start the clocks', 'startClocksAt'),
-          h('input#startClocksAt.form-control', {
-            attrs: {
-              type: 'datetime-local',
-              name: 'startClocksAt',
-            },
-          }),
-          h('p.form-text', [
-            'Date at which the clocks will be automatically started.',
-            h('br'),
-            'Note that the clocks can start earlier than specified, if players start making moves in the game.',
-            h('br'),
-            'Leave empty so that the clocks only start when players make moves.',
-          ]),
-        ]),
-        h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Schedule the games'),
-      ]
-    );
+      ]),
+      h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Schedule the games'),
+    ]);
 
-  renderResult = (result: Result) =>
-    h('div.card.mb-5', [
-      h('div.card-body', [
-        h('h2.card-title', ['Bulk #', result.id]),
+  private renderResult = (result: Result) =>
+    card(
+      ['Bulk #', result.id],
+      [
         h('p.lead', [
           'Game scheduled at: ',
           result.pairAt ? timeFormat(new Date(result.pairAt)) : 'Now',
@@ -240,6 +200,6 @@ export class ScheduleGames {
             })
           ),
         ]),
-      ]),
-    ]);
+      ]
+    );
 }

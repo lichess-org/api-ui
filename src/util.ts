@@ -1,5 +1,3 @@
-export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const variants = [
   ['standard', 'Standard'],
   ['chess960', 'Chess960'],
@@ -11,3 +9,5 @@ export const variants = [
   ['horde', 'Horde'],
   ['racingKings', 'RacingKing'],
 ];
+
+export const gameRules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin', 'noEarlyDraw'];

@@ -2,6 +2,7 @@ import { App } from './app';
 import page from 'page';
 import { Home } from './page/home';
 import { ScheduleGames } from './page/scheduleGames';
+import { OpenChallenge } from './page/openChallenge';
 
 export default function (app: App) {
   page.base(BASE_PATH);
@@ -17,10 +18,7 @@ export default function (app: App) {
     await app.auth.logout();
     location.href = BASE_PATH;
   });
-  // page('/endpoint/open-challenge', _ => {
-  //   if (app.auth.me) new OpenChallenge(app, app.auth.me).redraw();
-  //   else page('/login');
-  // });
+  page('/endpoint/open-challenge', _ => new OpenChallenge(app).redraw());
   page('/endpoint/schedule-games', _ => {
     if (app.auth.me) new ScheduleGames(app, app.auth.me).redraw();
     else page('/login');

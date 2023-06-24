@@ -4,6 +4,7 @@ import { App } from '../app';
 import { MaybeVNodes } from '../interfaces';
 import { href } from '../routing';
 import '../../scss/_navbar.scss';
+import { endpoints } from '../endpoints';
 
 export default function (app: App, body: MaybeVNodes): VNode {
   return h('body', [renderNavBar(app), h('div.container', body), renderFooter(app)]);
@@ -68,18 +69,7 @@ const endpointNav = () =>
             'aria-labelledby': 'navbarDropdown',
           },
         },
-        [
-          h(
-            'li',
-            h(
-              'a.dropdown-item',
-              {
-                attrs: href('/endpoint/bulk'),
-              },
-              'Schedule games'
-            )
-          ),
-        ]
+        endpoints.map(e => h('li', h('a.dropdown-item', { attrs: href(e.path), title: e.desc }, e.name)))
       ),
     ]),
   ]);
