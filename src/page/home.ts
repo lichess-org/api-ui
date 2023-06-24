@@ -29,7 +29,7 @@ export class Home {
     h('div.about', [
       h('p.lead.mt-5', [
         'This website provides a user interface to some of the ',
-        h('a', { attrs: href('https://lichess.org/api') }, 'Lichess API'),
+        h('a', { attrs: { href: 'https://lichess.org/api' } }, 'Lichess API'),
         ' endpoints.',
       ]),
     ]);
