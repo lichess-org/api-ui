@@ -14,7 +14,7 @@
 }
 
 .about {
-  text-align: left;
+  margin: 10em 0;
 }
 
 .loading {
@@ -22,4 +22,15 @@
   justify-content: center;
   align-items: center;
   min-height: 70vh;
+}
+
+.bd-footer {
+  a {
+    color: var(--bs-body-color);
+    text-decoration: none;
+  }
+  .lichess-logo-white {
+    max-height: 30px;
+    opacity: 0.8;
+  }
 }

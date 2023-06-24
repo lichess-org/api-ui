@@ -131,6 +131,34 @@ const renderFooter = (app: App) =>
   h(
     'footer.bd-footer.py-4.py-md-5.mt-5.bg-body-tertiary',
     h('div.container.py-4.py-md-5.px-4.px-md-3.text-body-secondary', [
-      h('div.config', [h('p', 'Configuration:'), h('code', JSON.stringify(app.config, null, 2))]),
+      h('div.row', [
+        h('div.col.mb-3', [
+          h(
+            'a.d-inline-flex.align-items-center.mb-2.text-body-emphasis.text-decoration-none',
+            { attrs: href('https://lichess.org') },
+            [
+              h('img.lichess-logo-white.me-2', {
+                attrs: {
+                  src: 'https://lichess1.org/assets/logo/lichess-white.svg',
+                  alt: 'Lichess logo',
+                },
+              }),
+              h('span.fs-5', 'Lichess'),
+            ]
+          ),
+        ]),
+        h('div.col.mb-3', [
+          h('h5', 'Links'),
+          h('ul.list-unstyled', [
+            h('li.mb-2', h('a', { attrs: href('https://lichess.org/api') }, 'Lichess API documentation')),
+            h(
+              'li.mb-2',
+              h('a', { attrs: href('https://github.com/lichess-org/api-ui') }, 'Source code of this website')
+            ),
+            h('li.mb-2', h('a', { attrs: href('https://lichess.org') }, 'The best chess server')),
+          ]),
+        ]),
+        h('div.col.mb-3', [h('h5', 'Configuration'), h('code', JSON.stringify(app.config, null, 2))]),
+      ]),
     ])
   );
