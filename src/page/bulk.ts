@@ -60,7 +60,12 @@ export class BulkPairing {
       try {
         pairingNames = playersTxt
           .split('\n')
-          .map(line => line.trim().replace(/\s+/g, ' ').split(' '))
+          .map(line =>
+            line
+              .trim()
+              .replace(/[\s,]+/g, ' ')
+              .split(' ')
+          )
           .map(names => [names[0].trim(), names[1].trim()]);
       } catch (err) {
         throw 'Invalid players format';
@@ -77,6 +82,7 @@ export class BulkPairing {
             })
             .sort(sortFn) as [string, string]
       );
+      const rules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin'].filter(key => !!get(key));
       // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
       const res = await this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
         method: 'POST',
@@ -88,6 +94,7 @@ export class BulkPairing {
           rated: !!get('rated'),
           pairAt: dateOf('pairAt'),
           startClocksAt: dateOf('startClocksAt'),
+          rules: rules.join(','),
         }),
       });
       const json: Result = await res.json();
@@ -144,10 +151,10 @@ export class BulkPairing {
           h('p.form-text', [
             'Two usernames per line, each line is a game.',
             h('br'),
-            'First username gets the white pieces, unless randomized by the checkbox below.',
+            'First username gets the white pieces, unless randomized by the switch below.',
           ]),
         ]),
-        h('div.form-check.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+        h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
         h('div.mb-3', [
           form.label('Clock'),
           h('div.input-group', [
@@ -156,7 +163,7 @@ export class BulkPairing {
             form.input('clockIncrement', { tpe: 'number', placeholder: 'Increment in seconds' }),
           ]),
         ]),
-        h('div.form-check.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
+        h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
         h('div.mb-3', [
           form.label('Variant', 'variant'),
           h(
@@ -164,6 +171,15 @@ export class BulkPairing {
             { attrs: { name: 'variant' } },
             variants.map(([key, name]) => form.selectOption(key, name))
           ),
+        ]),
+        h('div.mb-3', [
+          h('div', form.label('Special rules', 'rules')),
+          ...[
+            ['noAbort', 'Players cannot abort the game'],
+            ['noRematch', 'Players cannot offer a rematch'],
+            ['noGiveTime', 'Players cannot give extra time'],
+            ['noClaimWin', 'Players cannot claim the win if the opponent leaves'],
+          ].map(([key, label]) => h('div.form-check.form-switch.mb-1', form.checkboxWithLabel(key, label))),
         ]),
         h('div.mb-3', [
           form.label('When to create the games', 'pairAt'),
@@ -210,13 +226,15 @@ export class BulkPairing {
           h('thead', h('tr', [h('th', 'Game'), h('th', 'White'), h('th', 'Black')])),
           h(
             'tbody',
-            result.games.map(game =>
-              h('tr', [
-                h('td', h('a', { attrs: { href: `${this.lichessUrl}/${game.id}` } }, '#' + game.id)),
-                h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.white}` } }, game.white)),
-                h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.black}` } }, game.black)),
-              ])
-            )
+            result.games.map(game => {
+              const lichessLink = (path: string, text: string) =>
+                h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
+              return h('tr', [
+                h('td', lichessLink(game.id, '#' + game.id)),
+                h('td', lichessLink(`@/${game.white}`, game.white)),
+                h('td', lichessLink(`@/${game.black}`, game.black)),
+              ]);
+            })
           ),
         ]),
       ]),
