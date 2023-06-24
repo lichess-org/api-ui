@@ -46,6 +46,8 @@ export class OpenChallenge {
       const res = await fetch(`${this.app.config.lichessHost}/api/challenge/open`, {
         method: 'POST',
         body: formData({
+          'clock.limit': parseFloat(get('clockLimit')) * 60,
+          'clock.increment': get('clockIncrement'),
           variant: get('variant'),
           rated: !!get('rated'),
           rules: rules.join(','),
