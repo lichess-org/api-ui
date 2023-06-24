@@ -81,7 +81,9 @@ export class BulkPairing {
             })
             .sort(sortFn) as [string, string]
       );
-      const rules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin'].filter(key => !!get(key));
+      const rules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin', 'noEarlyDraw'].filter(
+        key => !!get(key)
+      );
       // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
       const res = await this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
         method: 'POST',
@@ -178,6 +180,7 @@ export class BulkPairing {
             ['noRematch', 'Players cannot offer a rematch'],
             ['noGiveTime', 'Players cannot give extra time'],
             ['noClaimWin', 'Players cannot claim the win if the opponent leaves'],
+            ['noEarlyDraw', 'Players cannot offer a draw before move 30 (ply 60)'],
           ].map(([key, label]) => h('div.form-check.form-switch.mb-1', form.checkboxWithLabel(key, label))),
         ]),
         h('div.mb-3', [
