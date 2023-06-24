@@ -38,8 +38,11 @@ export class Pairing {
             'Lichess bulk pairing API'
           ),
           ' to create a bunch of games at once.',
-          h('br'),
-          'Requires admin privileges to generate the player challenge tokens automatically.',
+        ]),
+        h('p', [
+          'Requires the ',
+          h('strong', 'API Challenge admin'),
+          ' permission to generate the player challenge tokens automatically.',
         ]),
         this.renderForm(),
       ])
