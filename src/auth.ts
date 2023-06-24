@@ -1,7 +1,7 @@
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
 import { BASE_PATH } from './routing';
 
-export const scopes = ['challenge:write', 'web:mod'];
+export const scopes = ['challenge:bulk', 'web:mod'];
 export const clientId = 'lichess-api-ui';
 export const clientUrl = `${location.protocol}//${location.host}${BASE_PATH || '/'}`;
 

@@ -5,6 +5,10 @@ import * as form from '../view/form';
 import { formData, variants } from '../util';
 import { Me } from '../auth';
 
+interface Tokens {
+  [username: string]: string;
+}
+
 export class Pairing {
   feedback: form.Feedback = undefined;
   constructor(readonly app: App, readonly me: Me) {}
@@ -23,21 +27,30 @@ export class Pairing {
 
   private onSubmit = async (form: FormData) => {
     try {
-      const playerId = form.get('player1') as string;
-      const opponentId = form.get('player2') as string;
-      const tokens = await this.adminChallengeTokens([playerId, opponentId]);
-      const res = await fetch(`${this.app.config.lichessHost}/api/challenge/${opponentId}`, {
+      const playersTxt = form.get('players') as string;
+      let pairingNames: [string, string][];
+      try {
+        pairingNames = playersTxt
+          .split('\n')
+          .map(line => line.trim().replace(/\s+/g, ' ').split(' '))
+          .map(names => [names[0].trim(), names[1].trim()]);
+      } catch (err) {
+        throw 'Invalid players format';
+      }
+      const tokens = await this.adminChallengeTokens(pairingNames.flat());
+      const sortFn = () => (form.get('randomColor') ? Math.random() - 0.5 : 0);
+      const pairingTokens: [string, string][] = pairingNames.map(
+        ([white, black]) => [tokens[white], tokens[black]].sort(sortFn) as [string, string]
+      );
+      // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
+      const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/bulk-pairing`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${tokens[playerId]}`,
-        },
         body: formData({
+          players: pairingTokens.map(([white, black]) => `${white}:${black}`).join(','),
           'clock.limit': parseFloat(form.get('clockLimit') as string) * 60,
           'clock.increment': form.get('clockIncrement'),
           variant: form.get('variant'),
-          color: form.get('color'),
           rated: !!form.get('rated'),
-          acceptByToken: tokens[opponentId],
         }),
       });
       const json = await res.json();
@@ -51,7 +64,7 @@ export class Pairing {
     }
   };
 
-  private adminChallengeTokens = async (users: string[]): Promise<any> => {
+  private adminChallengeTokens = async (users: string[]): Promise<Tokens> => {
     const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/token/admin-challenge`, {
       method: 'POST',
       body: formData({
@@ -81,16 +94,28 @@ export class Pairing {
           : this.feedback?.message
           ? h('div.alert.alert-danger', this.feedback.message)
           : null,
-        h('div.mb-3', [form.label('Player 1', 'player1'), form.input('player1', { value: 'neio' })]),
-        h('div.mb-3', [form.label('Player 2', 'player2'), form.input('player2', { value: 'lizen2' })]),
-        h('div.form-check.mb-3', [
-          h('input#rated.form-check-input', { attrs: { type: 'checkbox', value: '' } }),
-          h('label.form-check-label', { attrs: { for: 'rated' } }, 'Rated game'),
+        h('div.mb-3', [
+          form.label('Players', 'players'),
+          h(
+            'textarea.form-control',
+            {
+              attrs: {
+                name: 'players',
+                style: 'height: 100px',
+                required: true,
+              },
+            },
+            'lizen50 lizen51'
+          ),
+          h('p.form-text', [
+            'Two usernames per line, each line is a game.',
+            h('br'),
+            'First username gets the white pieces, unless randomized by the checkbox below.',
+          ]),
         ]),
-        h('select.form-select.mb-3', { attrs: { name: 'color' } }, [
-          form.selectOption('random', 'Random color'),
-          form.selectOption('white', 'Player 1 is white'),
-          form.selectOption('black', 'Player 1 is black'),
+        h('div.form-check.mb-3', [
+          h('input#randomColor.form-check-input', { attrs: { type: 'checkbox', value: '' } }),
+          h('label.form-check-label', { attrs: { for: 'randomColor' } }, 'Randomize colors'),
         ]),
         h('div.mb-3', [
           form.label('Clock'),
@@ -99,6 +124,10 @@ export class Pairing {
             h('span.input-group-text', '+'),
             form.input('clockIncrement', { tpe: 'number', placeholder: 'Increment in seconds' }),
           ]),
+        ]),
+        h('div.form-check.mb-3', [
+          h('input#rated.form-check-input', { attrs: { type: 'checkbox', value: '' } }),
+          h('label.form-check-label', { attrs: { for: 'rated' } }, 'Rated games'),
         ]),
         h('div.mb-3', [
           form.label('Variant', 'variant'),
