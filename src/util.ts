@@ -19,8 +19,3 @@ export const variants = [
   ['horde', 'Horde'],
   ['racingKings', 'RacingKing'],
 ];
-
-async function request<TResponse>(url: string, config: RequestInit, me: Me): Promise<TResponse> {
-  const response = await fetch(url, config);
-  return await response.json();
-}
