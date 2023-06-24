@@ -1,4 +1,5 @@
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
+import page from 'page';
 import { BASE_PATH } from './routing';
 
 export const scopes = ['challenge:bulk', 'web:mod'];
@@ -56,6 +57,10 @@ export class Auth {
   private authenticate = async () => {
     const httpClient = this.oauth.decorateFetchHTTPClient(window.fetch);
     const res = await httpClient(`${this.lichessHost}/api/account`);
+    if (res.status == 429) {
+      location.href = clientUrl + '#!/too-many-requests';
+      return;
+    }
     const me = {
       ...(await res.json()),
       httpClient,

@@ -9,7 +9,15 @@ export class Home {
   render = () => layout(this.app, h('div.app-home', this.app.auth.me ? this.userHome() : this.anonHome()));
   redraw = () => this.app.redraw(this.render());
 
-  userHome = () => [h('div', [this.renderAbout()])];
+  userHome = () => [this.renderAbout(), this.listEndpoints()];
+
+  listEndpoints = () =>
+    h('div.list-group.mb-7', [
+      h('a.list-group-item.list-group-item-action', { attrs: href('/endpoint/bulk') }, [
+        h('h3', 'Schedule games'),
+        h('span', 'Requires Lichess admin permissions'),
+      ]),
+    ]);
 
   anonHome = () => [
     h('div.login.text-center', [

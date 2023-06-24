@@ -2,7 +2,7 @@ import { App } from './app';
 import page from 'page';
 import { Home } from './page/home';
 import { BulkPairing } from './page/bulk';
-import { NotFound } from './page/notFound';
+import { Common } from './page/common';
 
 export default function (app: App) {
   page.base(BASE_PATH);
@@ -22,9 +22,8 @@ export default function (app: App) {
     if (app.auth.me) new BulkPairing(app, app.auth.me).redraw();
     else page('/login');
   });
-  page('*', _ => {
-    new NotFound(app).redraw();
-  });
+  page('/too-many-requests', _ => new Common(app).tooManyRequests());
+  page('*', _ => new Common(app).notFound());
   page({ hashbang: true });
 }
 
