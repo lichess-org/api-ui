@@ -11,7 +11,6 @@ export interface Me {
   id: string;
   username: string;
   httpClient: HttpClient; // with pre-set Authorization header
-  perfs: { [key: string]: any };
 }
 
 export class Auth {
