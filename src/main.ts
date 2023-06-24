@@ -8,7 +8,7 @@ import routing from './routing';
 import { App, Config } from './app';
 
 const config: Config = {
-  lichessHost: 'http://l.org',
+  lichessHost: localStorage.getItem('lichessHost') || 'https://lichess.org',
 };
 
 export default async function (element: HTMLElement) {

@@ -6,7 +6,7 @@ import { href } from '../routing';
 import '../../scss/_navbar.scss';
 
 export default function (app: App, body: MaybeVNodes): VNode {
-  return h('body', [renderNavBar(app), h('div.container', body)]);
+  return h('body', [renderNavBar(app), h('div.container', body), renderFooter(app)]);
 }
 
 const renderNavBar = (app: App) =>
@@ -125,4 +125,12 @@ const anonNav = () =>
       },
       'Login with Lichess'
     )
+  );
+
+const renderFooter = (app: App) =>
+  h(
+    'footer.bd-footer.py-4.py-md-5.mt-5.bg-body-tertiary',
+    h('div.container.py-4.py-md-5.px-4.px-md-3.text-body-secondary', [
+      h('div.config', [h('p', 'Configuration:'), h('code', JSON.stringify(app.config, null, 2))]),
+    ])
   );
