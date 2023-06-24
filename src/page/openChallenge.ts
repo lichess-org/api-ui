@@ -77,6 +77,7 @@ export class OpenChallenge {
 
   private renderResult = (result: Result) =>
     card(
+      result.challenge.id,
       ['Challenge #', result.challenge.id],
       [
         h('h3', 'Links'),

@@ -121,13 +121,13 @@ export class ScheduleGames {
     return json;
   };
 
-  private renderForm = (lastBulkId?: string) =>
+  private renderForm = (lastId?: string) =>
     form.form(this.onSubmit, [
       form.feedback(this.feedback),
       isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
       h('div.mb-3', [
         form.label('Players', 'players'),
-        h(`textarea.form-control.${lastBulkId || 'bulk-new'}`, {
+        h(`textarea.form-control.${lastId || 'bulk-new'}`, {
           attrs: {
             name: 'players',
             style: 'height: 100px',
@@ -176,6 +176,7 @@ export class ScheduleGames {
 
   private renderResult = (result: Result) =>
     card(
+      result.id,
       ['Bulk #', result.id],
       [
         h('p.lead', [

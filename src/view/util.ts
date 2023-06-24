@@ -18,8 +18,8 @@ export const timeFormat = new Intl.DateTimeFormat(document.documentElement.lang,
   minute: 'numeric',
 }).format;
 
-export const card = (header: MaybeVNodes, body: MaybeVNodes) =>
-  h('div.card.mb-5', [
+export const card = (id: string, header: MaybeVNodes, body: MaybeVNodes) =>
+  h(`div#card-${id}.card.mb-5`, [
     h('h2.card-header.bg-success.text-body-emphasis.pt-4.pb-4', header),
     h('div.card-body', body),
   ]);
