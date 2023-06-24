@@ -1,5 +1,4 @@
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
-import page from 'page';
 import { BASE_PATH } from './routing';
 
 export const scopes = ['challenge:bulk', 'web:mod'];
