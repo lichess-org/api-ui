@@ -27,8 +27,8 @@ export class BulkPairing {
     this.lichessUrl = app.config.lichessHost;
   }
   redraw = () => this.app.redraw(this.render());
-  render = () => {
-    return layout(
+  render = () =>
+    layout(
       this.app,
       h('div', [
         h('h1.mt-5', 'Bulk pairing'),
@@ -46,10 +46,9 @@ export class BulkPairing {
           h('strong', 'API Challenge admin'),
           ' permission to generate the player challenge tokens automatically.',
         ]),
-        this.renderForm(),
+        this.renderForm(form.isSuccess(this.feedback) ? this.feedback.result.id : undefined),
       ])
     );
-  };
 
   private onSubmit = async (form: FormData) => {
     const get = (key: string) => form.get(key) as string;
@@ -121,7 +120,7 @@ export class BulkPairing {
     return json;
   };
 
-  private renderForm = () =>
+  private renderForm = (lastBulkId?: string) =>
     h(
       'form.mt-5',
       {
@@ -141,7 +140,7 @@ export class BulkPairing {
         form.isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : null,
         h('div.mb-3', [
           form.label('Players', 'players'),
-          h('textarea.form-control', {
+          h(`textarea.form-control.${lastBulkId || 'bulk-new'}`, {
             attrs: {
               name: 'players',
               style: 'height: 100px',
