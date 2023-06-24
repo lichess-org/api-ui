@@ -4,6 +4,7 @@ import layout from '../view/layout';
 import * as form from '../view/form';
 import { formData, variants } from '../util';
 import { Me } from '../auth';
+import { timeFormat } from '../view/util';
 
 interface Tokens {
   [username: string]: string;
@@ -15,6 +16,8 @@ interface Result {
     white: string;
     black: string;
   }[];
+  pairAt: number;
+  startClocksAt: number;
 }
 
 export class Pairing {
@@ -25,10 +28,9 @@ export class Pairing {
   }
   redraw = () => this.app.redraw(this.render());
   render = () => {
-    console.log(this.feedback);
     return layout(
       this.app,
-      h('div.app-pairing', [
+      h('div', [
         h('h1.mt-5', 'Bulk pairing'),
         h('p.lead', [
           'Uses the ',
@@ -50,8 +52,10 @@ export class Pairing {
   };
 
   private onSubmit = async (form: FormData) => {
+    const get = (key: string) => form.get(key) as string;
+    const dateOf = (key: string) => get(key) && new Date(get(key)).getTime();
     try {
-      const playersTxt = form.get('players') as string;
+      const playersTxt = get('players');
       let pairingNames: [string, string][];
       try {
         pairingNames = playersTxt
@@ -62,7 +66,7 @@ export class Pairing {
         throw 'Invalid players format';
       }
       const tokens = await this.adminChallengeTokens(pairingNames.flat());
-      const randomColor = !!form.get('randomColor');
+      const randomColor = !!get('randomColor');
       const sortFn = () => (randomColor ? Math.random() - 0.5 : 0);
       const pairingTokens: [string, string][] = pairingNames.map(
         duo =>
@@ -78,10 +82,12 @@ export class Pairing {
         method: 'POST',
         body: formData({
           players: pairingTokens.map(([white, black]) => `${white}:${black}`).join(','),
-          'clock.limit': parseFloat(form.get('clockLimit') as string) * 60,
-          'clock.increment': form.get('clockIncrement'),
-          variant: form.get('variant'),
-          rated: !!form.get('rated'),
+          'clock.limit': parseFloat(get('clockLimit')) * 60,
+          'clock.increment': get('clockIncrement'),
+          variant: get('variant'),
+          rated: !!get('rated'),
+          pairAt: dateOf('pairAt'),
+          startClocksAt: dateOf('startClocksAt'),
         }),
       });
       const json: Result = await res.json();
@@ -121,7 +127,7 @@ export class Pairing {
       },
       [
         form.isSuccess(this.feedback)
-          ? h('div.alert.alert-success', 'Games created!')
+          ? h('div.alert.alert-success', 'Games scheduled!')
           : form.isFailure(this.feedback)
           ? h('div.alert.alert-danger', this.feedback.message)
           : null,
@@ -163,25 +169,59 @@ export class Pairing {
             variants.map(([key, name]) => form.selectOption(key, name))
           ),
         ]),
-        h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Create the games'),
+        h('div.mb-3', [
+          form.label('When to create the games', 'pairAt'),
+          h('input#pairAt.form-control', {
+            attrs: {
+              type: 'datetime-local',
+              name: 'pairAt',
+            },
+          }),
+          h('p.form-text', 'Leave empty to create the games immediately'),
+        ]),
+        h('div.mb-3', [
+          form.label('When to start the clocks', 'startClocksAt'),
+          h('input#startClocksAt.form-control', {
+            attrs: {
+              type: 'datetime-local',
+              name: 'startClocksAt',
+            },
+          }),
+          h('p.form-text', [
+            'Date at which the clocks will be automatically started.',
+            h('br'),
+            'Note that the clocks can start earlier than specified, if players start making moves in the game.',
+            h('br'),
+            'Leave empty so that the clocks only start when players make moves.',
+          ]),
+        ]),
+        h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Schedule the games'),
       ]
     );
 
   renderResult = (result: Result) =>
-    h(
-      'div.mb-5',
-      h('table.table.table-striped', [
-        h('thead', h('tr', [h('th', 'Game'), h('th', 'White'), h('th', 'Black')])),
-        h(
-          'tbody',
-          result.games.map(game =>
-            h('tr', [
-              h('td', h('a', { attrs: { href: `${this.lichessUrl}/${game.id}` } }, '#' + game.id)),
-              h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.white}` } }, game.white)),
-              h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.black}` } }, game.black)),
-            ])
-          )
-        ),
-      ])
-    );
+    h('div.card.mb-5', [
+      h('div.card-body', [
+        h('p.lead', [
+          'Game scheduled at: ',
+          result.pairAt ? timeFormat(new Date(result.pairAt)) : 'Now',
+          h('br'),
+          'Clocks start at: ',
+          result.startClocksAt ? timeFormat(new Date(result.startClocksAt)) : 'Player first moves',
+        ]),
+        h('table.table.table-striped', [
+          h('thead', h('tr', [h('th', 'Game'), h('th', 'White'), h('th', 'Black')])),
+          h(
+            'tbody',
+            result.games.map(game =>
+              h('tr', [
+                h('td', h('a', { attrs: { href: `${this.lichessUrl}/${game.id}` } }, '#' + game.id)),
+                h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.white}` } }, game.white)),
+                h('td', h('a', { attrs: { href: `${this.lichessUrl}/@/${game.black}` } }, game.black)),
+              ])
+            )
+          ),
+        ]),
+      ]),
+    ]);
 }
