@@ -12,7 +12,7 @@ export interface Input {
 export const makeInput = (opts: Partial<Input>): Input => ({
   tpe: 'string',
   placeholder: '',
-  required: true,
+  required: false,
   ...opts,
 });
 
@@ -46,9 +46,19 @@ export const clock = () =>
   h('div.mb-3', [
     label('Clock'),
     h('div.input-group', [
-      input('clockLimit', { tpe: 'number', value: '5', placeholder: 'Initial time in minutes' }),
+      input('clockLimit', {
+        tpe: 'number',
+        // value: '5',
+        required: true,
+        placeholder: 'Initial time in minutes',
+      }),
       h('span.input-group-text', '+'),
-      input('clockIncrement', { tpe: 'number', value: '3', placeholder: 'Increment in seconds' }),
+      input('clockIncrement', {
+        tpe: 'number',
+        // value: '3',
+        required: true,
+        placeholder: 'Increment in seconds',
+      }),
     ]),
   ]);
 
@@ -74,9 +84,19 @@ export const specialRules = () =>
     ].map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
   ]);
 
+export const fen = () =>
+  h('div.mb-3', [
+    label('FEN initial position', 'fen'),
+    input('fen', { tpe: 'text' }),
+    h(
+      'p.form-text',
+      'If set, the variant must be standard, fromPosition, or chess960 (if a valid 960 starting position), and the game cannot be rated.'
+    ),
+  ]);
+
 export const form = (onSubmit: (form: FormData) => void, content: MaybeVNodes) =>
   h(
-    'form.mt-5',
+    'form#endpoint-form.mt-5',
     {
       on: {
         submit: (e: Event) => {

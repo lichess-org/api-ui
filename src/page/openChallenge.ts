@@ -10,6 +10,9 @@ interface Result {
   challenge: {
     id: string;
     url: string;
+    open: {
+      userIds?: [string, string];
+    };
   };
   urlWhite: string;
   urlBlack: string;
@@ -50,6 +53,11 @@ export class OpenChallenge {
           'clock.increment': get('clockIncrement'),
           variant: get('variant'),
           rated: !!get('rated'),
+          fen: get('fen'),
+          name: get('name'),
+          users: get('users')
+            .trim()
+            .replace(/[\s,]+/g, ','),
           rules: rules.join(','),
         }),
       });
@@ -62,6 +70,7 @@ export class OpenChallenge {
       };
     }
     this.redraw();
+    document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   private renderForm = () =>
@@ -71,19 +80,39 @@ export class OpenChallenge {
       form.clock(),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated game')),
       form.variant(),
+      form.fen(),
+      h('div.mb-3', [
+        form.label('Challenge name', 'name'),
+        form.input('name', { tpe: 'text' }),
+        h('p.form-text', 'Optional text that players will see on the challenge page.'),
+      ]),
+      h('div.mb-3', [
+        form.label('Only allow these players to join', 'name'),
+        form.input('users', { tpe: 'text' }),
+        h(
+          'p.form-text',
+          'Optional pair of usernames, separated by a comma. If set, only these users will be allowed to join the game. The first username gets the white pieces.'
+        ),
+      ]),
       form.specialRules(),
       h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Create the challenge'),
     ]);
 
-  private renderResult = (result: Result) =>
-    card(
-      result.challenge.id,
-      ['Challenge #', result.challenge.id],
+  private renderResult = (result: Result) => {
+    const c = result.challenge;
+    return card(
+      c.id,
+      ['Challenge #', c.id],
       [
         h('h3', 'Links'),
-        copyInput('Game URL - random color', result.challenge.url),
-        copyInput('Game URL for white', result.urlWhite),
-        copyInput('Game URL for black', result.urlBlack),
+        ...(c.open?.userIds
+          ? [copyInput('Game URL', c.url)]
+          : [
+              copyInput('Game URL - random color', c.url),
+              copyInput('Game URL for white', result.urlWhite),
+              copyInput('Game URL for black', result.urlBlack),
+            ]),
       ]
     );
+  };
 }

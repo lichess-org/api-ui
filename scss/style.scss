@@ -1,6 +1,10 @@
 @import './bootstrap';
 @import './navbar';
 
+body > .container {
+  min-height: 60vh;
+}
+
 .login {
   .about {
     margin: 10vh 10vw;
@@ -14,7 +18,7 @@
 }
 
 .about {
-  margin: 10em 0;
+  padding: 5em 0;
 }
 
 .loading {

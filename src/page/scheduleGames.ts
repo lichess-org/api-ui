@@ -106,6 +106,7 @@ export class ScheduleGames {
       };
     }
     this.redraw();
+    document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   private adminChallengeTokens = async (users: string[]): Promise<Tokens> => {
