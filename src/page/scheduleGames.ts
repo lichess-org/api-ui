@@ -2,7 +2,7 @@ import { h } from 'snabbdom';
 import { App } from '../app';
 import { Me } from '../auth';
 import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRules } from '../util';
+import { gameRuleKeys } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
@@ -82,8 +82,7 @@ export class ScheduleGames {
             })
             .sort(sortFn) as [string, string]
       );
-      const rules = gameRules.filter(key => !!get(key));
-      // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
+      const rules = gameRuleKeys.filter(key => !!get(key));
       const req = this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
         method: 'POST',
         body: formData({

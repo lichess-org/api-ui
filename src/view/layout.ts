@@ -3,7 +3,6 @@ import { Me } from '../auth';
 import { App } from '../app';
 import { MaybeVNodes } from '../interfaces';
 import { href } from '../routing';
-import '../../scss/_navbar.scss';
 import { endpoints } from '../endpoints';
 
 export default function (app: App, body: MaybeVNodes): VNode {
