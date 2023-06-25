@@ -101,7 +101,7 @@ export class ScheduleGames {
       this.feedback = await responseToFeedback(req);
     } catch (err) {
       this.feedback = {
-        message: JSON.stringify((err as any).error || err),
+        error: { players: err as string },
       };
     }
     this.redraw();
@@ -179,7 +179,7 @@ export class ScheduleGames {
             name: 'pairAt',
           },
         }),
-        h('p.form-text', 'Leave empty to create the games immediately'),
+        h('p.form-text', 'Leave empty to create the games immediately.'),
       ]),
       h('div.mb-3', [
         form.label('When to start the clocks', 'startClocksAt'),
