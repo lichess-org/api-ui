@@ -128,7 +128,7 @@ export class ScheduleGames {
       isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
       h('div.mb-3', [
         form.label('Players', 'players'),
-        h(`textarea.form-control.${lastId || 'bulk-new'}`, {
+        h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
           attrs: {
             name: 'players',
             style: 'height: 100px',
@@ -149,10 +149,10 @@ export class ScheduleGames {
       h('div.mb-3', [
         form.label('Inbox message', 'message'),
         h(
-          'textarea.form-control',
+          'textarea#message.form-control',
           {
             attrs: {
-              name: 'players',
+              name: 'message',
               style: 'height: 100px',
             },
           },
