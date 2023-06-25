@@ -92,6 +92,8 @@ export class ScheduleGames {
           'clock.increment': get('clockIncrement'),
           variant: get('variant'),
           rated: !!get('rated'),
+          fen: get('fen'),
+          message: get('message'),
           pairAt: dateOf('pairAt'),
           startClocksAt: dateOf('startClocksAt'),
           rules: rules.join(','),
@@ -143,6 +145,32 @@ export class ScheduleGames {
       form.clock(),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
       form.variant(),
+      form.fen(),
+      h('div.mb-3', [
+        form.label('Inbox message', 'message'),
+        h(
+          'textarea.form-control',
+          {
+            attrs: {
+              name: 'players',
+              style: 'height: 100px',
+            },
+          },
+          'Your game with {opponent} is ready: {game}.'
+        ),
+        h('p.form-text', [
+          'Message that will be sent to each player, when the game is created. It is sent from your user account.',
+          h('br'),
+          h('code', '{opponent}'),
+          ' and ',
+          h('code', '{game}'),
+          ' are placeholders that will be replaced with the opponent and the game URLs.',
+          h('br'),
+          'The ',
+          h('code', '{game}'),
+          ' placeholder is mandatory.',
+        ]),
+      ]),
       form.specialRules(),
       h('div.mb-3', [
         form.label('When to create the games', 'pairAt'),
