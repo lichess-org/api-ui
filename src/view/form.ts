@@ -108,6 +108,8 @@ export const form = (onSubmit: (form: FormData) => void, content: MaybeVNodes) =
     content
   );
 
+export const submit = (label: string) => h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, label);
+
 export const feedback = <R>(feedback: Feedback<R>) =>
   isFailure(feedback) ? h('div.alert.alert-danger', feedback.message) : undefined;
 

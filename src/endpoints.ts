@@ -14,4 +14,9 @@ export const endpoints: Endpoint[] = [
     desc: 'Requires Lichess admin permissions',
     path: '/endpoint/schedule-games',
   },
+  {
+    name: 'Puzzle race',
+    desc: 'Create a private puzzle race with an invite link',
+    path: '/endpoint/puzzle-race',
+  },
 ];

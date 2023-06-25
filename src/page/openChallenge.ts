@@ -85,7 +85,7 @@ export class OpenChallenge {
         ),
       ]),
       form.specialRules(),
-      h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Create the challenge'),
+      form.submit('Create the challenge'),
     ]);
 
   private renderResult = (result: Result) => {

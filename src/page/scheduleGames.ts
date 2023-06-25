@@ -198,7 +198,7 @@ export class ScheduleGames {
           'Leave empty so that the clocks only start when players make moves.',
         ]),
       ]),
-      h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, 'Schedule the games'),
+      form.submit('Schedule the games'),
     ]);
 
   private renderResult = (result: Result) =>

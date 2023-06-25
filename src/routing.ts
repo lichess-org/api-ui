@@ -3,8 +3,15 @@ import page from 'page';
 import { Home } from './page/home';
 import { ScheduleGames } from './page/scheduleGames';
 import { OpenChallenge } from './page/openChallenge';
+import { PuzzleRace } from './page/puzzleRace';
+import { Me } from './auth';
 
 export default function (app: App) {
+  const withAuth = (f: (me: Me) => void) => {
+    if (app.auth.me) f(app.auth.me);
+    else page('/login');
+  };
+
   page.base(BASE_PATH);
   page('/', ctx => {
     if (ctx.querystring.includes('code=liu_')) history.pushState({}, '', BASE_PATH || '/');
@@ -19,10 +26,8 @@ export default function (app: App) {
     location.href = BASE_PATH;
   });
   page('/endpoint/open-challenge', _ => new OpenChallenge(app).redraw());
-  page('/endpoint/schedule-games', _ => {
-    if (app.auth.me) new ScheduleGames(app, app.auth.me).redraw();
-    else page('/login');
-  });
+  page('/endpoint/schedule-games', _ => withAuth(me => new ScheduleGames(app, me).redraw()));
+  page('/endpoint/puzzle-race', _ => withAuth(me => new PuzzleRace(app, me).redraw()));
   page('/too-many-requests', _ => app.tooManyRequests());
   page('*', _ => app.notFound());
   page({ hashbang: true });

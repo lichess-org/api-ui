@@ -69,7 +69,9 @@ const endpointNav = () =>
             'aria-labelledby': 'navbarDropdown',
           },
         },
-        endpoints.map(e => h('li', h('a.dropdown-item', { attrs: href(e.path), title: e.desc }, e.name)))
+        endpoints.map(e =>
+          h('li', h('a.dropdown-item', { attrs: { ...href(e.path), title: e.desc } }, e.name))
+        )
       ),
     ]),
   ]);
