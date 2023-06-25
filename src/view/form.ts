@@ -110,3 +110,6 @@ export const form = (onSubmit: (form: FormData) => void, content: MaybeVNodes) =
 
 export const feedback = <R>(feedback: Feedback<R>) =>
   isFailure(feedback) ? h('div.alert.alert-danger', feedback.message) : undefined;
+
+export const scrollToForm = () =>
+  document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });

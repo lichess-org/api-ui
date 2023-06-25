@@ -41,14 +41,14 @@ const renderNavBar = (app: App) =>
       ),
       h('div#navbarSupportedContent.collapse.navbar-collapse', [
         h('ul.navbar-nav.me-auto.mb-lg-0"', []),
-        app.auth.me ? endpointNav() : null,
+        endpointNav(),
         h('ul.navbar-nav', [app.auth.me ? userNav(app.auth.me) : anonNav()]),
       ]),
     ]),
   ]);
 
 const endpointNav = () =>
-  h('ul.navbar-nav', [
+  h('ul.navbar-nav.me-3', [
     h('li.nav-item.dropdown', [
       h(
         'a#navbarDropdown.nav-link.dropdown-toggle',

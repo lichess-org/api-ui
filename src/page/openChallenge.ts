@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Feedback, formData, isSuccess } from '../form';
+import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
@@ -41,36 +41,26 @@ export class OpenChallenge {
       ])
     );
 
-  private onSubmit = async (form: FormData) => {
-    const get = (key: string) => form.get(key) as string;
-    try {
-      const rules = gameRules.filter(key => !!get(key));
-      // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
-      const res = await fetch(`${this.app.config.lichessHost}/api/challenge/open`, {
-        method: 'POST',
-        body: formData({
-          'clock.limit': parseFloat(get('clockLimit')) * 60,
-          'clock.increment': get('clockIncrement'),
-          variant: get('variant'),
-          rated: !!get('rated'),
-          fen: get('fen'),
-          name: get('name'),
-          users: get('users')
-            .trim()
-            .replace(/[\s,]+/g, ','),
-          rules: rules.join(','),
-        }),
-      });
-      const json: Result = await res.json();
-      if (res.status != 200) throw json;
-      this.feedback = { result: json };
-    } catch (err) {
-      this.feedback = {
-        message: JSON.stringify(err),
-      };
-    }
+  private onSubmit = async (data: FormData) => {
+    const get = (key: string) => data.get(key) as string;
+    const req = fetch(`${this.app.config.lichessHost}/api/challenge/open`, {
+      method: 'POST',
+      body: formData({
+        'clock.limit': parseFloat(get('clockLimit')) * 60,
+        'clock.increment': get('clockIncrement'),
+        variant: get('variant'),
+        rated: !!get('rated'),
+        fen: get('fen'),
+        name: get('name'),
+        users: get('users')
+          .trim()
+          .replace(/[\s,]+/g, ','),
+        rules: gameRules.filter(key => !!get(key)).join(','),
+      }),
+    });
+    this.feedback = await responseToFeedback(req);
     this.redraw();
-    document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
+    form.scrollToForm();
   };
 
   private renderForm = () =>

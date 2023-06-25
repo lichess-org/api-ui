@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
 import { Me } from '../auth';
-import { Feedback, formData, isSuccess } from '../form';
+import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
@@ -84,7 +84,7 @@ export class ScheduleGames {
       );
       const rules = gameRules.filter(key => !!get(key));
       // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
-      const res = await this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
+      const req = this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
         method: 'POST',
         body: formData({
           players: pairingTokens.map(([white, black]) => `${white}:${black}`).join(','),
@@ -97,12 +97,10 @@ export class ScheduleGames {
           rules: rules.join(','),
         }),
       });
-      const json: Result = await res.json();
-      if (res.status != 200) throw json;
-      this.feedback = { result: json };
+      this.feedback = await responseToFeedback(req);
     } catch (err) {
       this.feedback = {
-        message: JSON.stringify(err),
+        message: JSON.stringify((err as any).error || err),
       };
     }
     this.redraw();
