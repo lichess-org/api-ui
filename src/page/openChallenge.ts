@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Feedback, formData, formToEndpoint, isSuccess } from '../form';
+import { Feedback, formData, isSuccess } from '../form';
 import { gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
@@ -41,12 +41,12 @@ export class OpenChallenge {
       ])
     );
 
-  private onSubmit = async (form: FormData) =>
-    formToEndpoint(
-      form,
-      this.redraw
-    )(get => {
-      this.feedback = await fetch(`${this.app.config.lichessHost}/api/challenge/open`, {
+  private onSubmit = async (form: FormData) => {
+    const get = (key: string) => form.get(key) as string;
+    try {
+      const rules = gameRules.filter(key => !!get(key));
+      // https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate
+      const res = await fetch(`${this.app.config.lichessHost}/api/challenge/open`, {
         method: 'POST',
         body: formData({
           'clock.limit': parseFloat(get('clockLimit')) * 60,
@@ -58,10 +58,20 @@ export class OpenChallenge {
           users: get('users')
             .trim()
             .replace(/[\s,]+/g, ','),
-          rules: gameRules.filter(key => !!get(key)).join(','),
+          rules: rules.join(','),
         }),
       });
-    });
+      const json: Result = await res.json();
+      if (res.status != 200) throw json;
+      this.feedback = { result: json };
+    } catch (err) {
+      this.feedback = {
+        message: JSON.stringify(err),
+      };
+    }
+    this.redraw();
+    document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   private renderForm = () =>
     form.form(this.onSubmit, [
