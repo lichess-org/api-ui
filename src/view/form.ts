@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
-import { variants } from '../util';
+import { gameRules, variants } from '../util';
 import { MaybeVNodes } from '../interfaces';
-import { Feedback, isSuccess, isFailure } from '../form';
+import { Failure, Feedback, isFailure } from '../form';
 
 export interface Input {
   tpe: string;
@@ -75,13 +75,7 @@ export const variant = () =>
 export const specialRules = () =>
   h('div.mb-3', [
     h('div', label('Special rules', 'rules')),
-    ...[
-      ['noAbort', 'Players cannot abort the game'],
-      ['noRematch', 'Players cannot offer a rematch'],
-      ['noGiveTime', 'Players cannot give extra time'],
-      ['noClaimWin', 'Players cannot claim the win if the opponent leaves'],
-      ['noEarlyDraw', 'Players cannot offer a draw before move 30 (ply 60)'],
-    ].map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
+    ...gameRules.map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
   ]);
 
 export const fen = () =>
@@ -111,7 +105,13 @@ export const form = (onSubmit: (form: FormData) => void, content: MaybeVNodes) =
 export const submit = (label: string) => h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, label);
 
 export const feedback = <R>(feedback: Feedback<R>) =>
-  isFailure(feedback) ? h('div.alert.alert-danger', feedback.message) : undefined;
+  isFailure(feedback) ? h('div.alert.alert-danger', renderErrors(feedback)) : undefined;
+
+const renderErrors = (fail: Failure) =>
+  h(
+    'ul.mb-0',
+    Object.entries(fail.error).map(([k, v]) => h('li', `${k}: ${v}`))
+  );
 
 export const scrollToForm = () =>
   document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });

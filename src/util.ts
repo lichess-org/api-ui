@@ -10,4 +10,11 @@ export const variants = [
   ['racingKings', 'RacingKing'],
 ];
 
-export const gameRules = ['noAbort', 'noRematch', 'noGiveTime', 'noClaimWin', 'noEarlyDraw'];
+export const gameRules = [
+  ['noAbort', 'Players cannot abort the game'],
+  ['noRematch', 'Players cannot offer a rematch'],
+  ['noGiveTime', 'Players cannot give extra time'],
+  ['noClaimWin', 'Players cannot claim the win if the opponent leaves'],
+  ['noEarlyDraw', 'Players cannot offer a draw before move 30 (ply 60)'],
+];
+export const gameRuleKeys = gameRules.map(([key]) => key);

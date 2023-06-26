@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
 import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRules } from '../util';
+import { gameRuleKeys } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, copyInput } from '../view/util';
@@ -55,7 +55,7 @@ export class OpenChallenge {
         users: get('users')
           .trim()
           .replace(/[\s,]+/g, ','),
-        rules: gameRules.filter(key => !!get(key)).join(','),
+        rules: gameRuleKeys.filter(key => !!get(key)).join(','),
       }),
     });
     this.feedback = await responseToFeedback(req);

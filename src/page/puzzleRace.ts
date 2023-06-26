@@ -1,7 +1,6 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRules } from '../util';
+import { Feedback, isSuccess, responseToFeedback } from '../form';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, copyInput } from '../view/util';
