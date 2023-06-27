@@ -4,7 +4,7 @@ Some web UIs for [the Lichess API](https://lichess.org/api)
 
 ## Try it out
 
-[The app is hosted on Github Pages](https://lichess-org.github.io/api-ui/)
+[https://lichess.org/api/ui](https://lichess.org/api/ui)
 
 ## Run it on your machine
 
