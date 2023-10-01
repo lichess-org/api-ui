@@ -59,6 +59,7 @@ export class ScheduleGames {
       let pairingNames: [string, string][];
       try {
         pairingNames = playersTxt
+          .toLowerCase()
           .split('\n')
           .map(line =>
             line
