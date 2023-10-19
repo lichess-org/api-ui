@@ -1,5 +1,5 @@
 import { h } from 'snabbdom';
-import { gameRules, variants } from '../util';
+import { variants } from '../util';
 import { MaybeVNodes } from '../interfaces';
 import { Failure, Feedback, isFailure } from '../form';
 
@@ -72,10 +72,10 @@ export const variant = () =>
     ),
   ]);
 
-export const specialRules = () =>
+export const specialRules = (rules: [string, string][]) =>
   h('div.mb-3', [
     h('div', label('Special rules', 'rules')),
-    ...gameRules.map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
+    ...rules.map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
   ]);
 
 export const fen = () =>

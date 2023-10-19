@@ -2,7 +2,7 @@ import { h } from 'snabbdom';
 import { App } from '../app';
 import { Me } from '../auth';
 import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRuleKeys } from '../util';
+import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
@@ -171,7 +171,7 @@ export class ScheduleGames {
           ' placeholder is mandatory.',
         ]),
       ]),
-      form.specialRules(),
+      form.specialRules(gameRules),
       h('div.mb-3', [
         form.label('When to create the games', 'pairAt'),
         h('input#pairAt.form-control', {

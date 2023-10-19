@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
 import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRuleKeys } from '../util';
+import { gameRuleKeysExceptNoAbort, gameRulesExceptNoAbort } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, copyInput } from '../view/util';
@@ -55,7 +55,7 @@ export class OpenChallenge {
         users: get('users')
           .trim()
           .replace(/[\s,]+/g, ','),
-        rules: gameRuleKeys.filter(key => !!get(key)).join(','),
+        rules: gameRuleKeysExceptNoAbort.filter(key => !!get(key)).join(','),
       }),
     });
     this.feedback = await responseToFeedback(req);
@@ -84,7 +84,7 @@ export class OpenChallenge {
           'Optional pair of usernames, separated by a comma. If set, only these users will be allowed to join the game. The first username gets the white pieces.'
         ),
       ]),
-      form.specialRules(),
+      form.specialRules(gameRulesExceptNoAbort),
       form.submit('Create the challenge'),
     ]);
 
