@@ -7,7 +7,7 @@ export const spinner = () =>
   h(
     'div.spinner-border.text-primary',
     { attrs: { role: 'status' } },
-    h('span.visually-hidden', 'Loading...')
+    h('span.visually-hidden', 'Loading...'),
   );
 
 export const timeFormat = new Intl.DateTimeFormat(document.documentElement.lang, {
@@ -38,7 +38,7 @@ export const copyInput = (label: string, value: string) => {
           },
         },
       },
-      'Copy'
+      'Copy',
     ),
     h('div.form-floating', [
       h(`input#${id}.form-control`, {

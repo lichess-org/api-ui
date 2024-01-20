@@ -10,7 +10,10 @@ export interface Config {
 export class App {
   auth: Auth;
 
-  constructor(readonly config: Config, readonly redraw: Redraw) {
+  constructor(
+    readonly config: Config,
+    readonly redraw: Redraw,
+  ) {
     this.auth = new Auth(config.lichessHost);
   }
 
@@ -20,7 +23,7 @@ export class App {
     this.redraw(
       layout(
         this,
-        h('div', [h('h1.mt-5', 'Too many requests'), h('p.lead', 'Please wait a little then try again.')])
-      )
+        h('div', [h('h1.mt-5', 'Too many requests'), h('p.lead', 'Please wait a little then try again.')]),
+      ),
     );
 }

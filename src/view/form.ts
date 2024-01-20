@@ -68,7 +68,7 @@ export const variant = () =>
     h(
       'select.form-select',
       { attrs: { name: 'variant' } },
-      variants.map(([key, name]) => selectOption(key, name))
+      variants.map(([key, name]) => selectOption(key, name)),
     ),
   ]);
 
@@ -84,7 +84,7 @@ export const fen = () =>
     input('fen', { tpe: 'text' }),
     h(
       'p.form-text',
-      'If set, the variant must be standard, fromPosition, or chess960 (if a valid 960 starting position), and the game cannot be rated.'
+      'If set, the variant must be standard, fromPosition, or chess960 (if a valid 960 starting position), and the game cannot be rated.',
     ),
   ]);
 
@@ -99,7 +99,7 @@ export const form = (onSubmit: (form: FormData) => void, content: MaybeVNodes) =
         },
       },
     },
-    content
+    content,
   );
 
 export const submit = (label: string) => h('button.btn.btn-primary.btn-lg.mt-3', { type: 'submit' }, label);
@@ -110,7 +110,7 @@ export const feedback = <R>(feedback: Feedback<R>) =>
 const renderErrors = (fail: Failure) =>
   h(
     'ul.mb-0',
-    Object.entries(fail.error).map(([k, v]) => h('li', `${k}: ${v}`))
+    Object.entries(fail.error).map(([k, v]) => h('li', `${k}: ${v}`)),
   );
 
 export const scrollToForm = () =>

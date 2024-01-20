@@ -15,7 +15,7 @@
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/page": "^1.11.6",
     "http-server": "^14.1.1",
-    "prettier": "^2.8.8",
+    "prettier": "^3.2.4",
     "rollup": "^2.79.1",
     "rollup-plugin-scss": "~4.0.0",
     "sass": "~1.63.6",
@@ -26,6 +26,7 @@
     "build": "rollup --config",
     "watch": "rollup --config --watch",
     "prod": "rollup --config --config-prod",
-    "serve": "http-server"
+    "serve": "http-server",
+    "format": "prettier --write ."
   }
 }
