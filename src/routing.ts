@@ -4,6 +4,7 @@ import { Home } from './page/home';
 import { ScheduleGames } from './page/scheduleGames';
 import { OpenChallenge } from './page/openChallenge';
 import { PuzzleRace } from './page/puzzleRace';
+import { BulkList } from './page/bulkList';
 import { Me } from './auth';
 
 export default function (app: App) {
@@ -26,7 +27,8 @@ export default function (app: App) {
     location.href = BASE_PATH;
   });
   page('/endpoint/open-challenge', _ => new OpenChallenge(app).redraw());
-  page('/endpoint/schedule-games', _ => withAuth(me => new ScheduleGames(app, me).redraw()));
+  page('/endpoint/schedule-games', _ => withAuth(me => new BulkList(app, me).redraw()));
+  page('/endpoint/schedule-games/new', _ => withAuth(me => new ScheduleGames(app, me).redraw()));
   page('/endpoint/puzzle-race', _ => withAuth(me => new PuzzleRace(app, me).redraw()));
   page('/too-many-requests', _ => app.tooManyRequests());
   page('*', _ => app.notFound());
