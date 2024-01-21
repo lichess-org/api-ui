@@ -94,8 +94,8 @@ export function formatPairings(players: Player[], pairings: Pairing[]): PairingR
     const white = players.find(player => player.name === pairing.white);
     const black = players.find(player => player.name === pairing.black);
 
-    if (!white) throw new Error(`Could not find in player list: ${pairing.white}`);
-    if (!black) throw new Error(`Could not find in player list: ${pairing.black}`);
+    if (!white) throw new Error(`Name in pairing list but not in player list: ${pairing.white}`);
+    if (!black) throw new Error(`Name in pairing list but not in player list: ${pairing.black}`);
 
     return { white, black };
   });

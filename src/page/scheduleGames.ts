@@ -221,16 +221,21 @@ export class ScheduleGames {
                       const players = await getPlayers(playersUrl);
                       const pairings = await getPairings(pairingsUrl);
 
-                      formatPairings(players, pairings).forEach(pairing => {
-                        const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+                      try {
+                        formatPairings(players, pairings).forEach(pairing => {
+                          const playersTxt = (document.getElementById('players') as HTMLTextAreaElement)
+                            .value;
 
-                        const white = pairing.white.lichess || `<${pairing.white.name}>`;
-                        const black = pairing.black.lichess || `<${pairing.black.name}>`;
+                          const white = pairing.white.lichess || `<${pairing.white.name}>`;
+                          const black = pairing.black.lichess || `<${pairing.black.name}>`;
 
-                        const newLine = `${white} ${black}`;
-                        (document.getElementById('players') as HTMLTextAreaElement).value =
-                          playersTxt + (playersTxt ? '\n' : '') + newLine;
-                      });
+                          const newLine = `${white} ${black}`;
+                          (document.getElementById('players') as HTMLTextAreaElement).value =
+                            playersTxt + (playersTxt ? '\n' : '') + newLine;
+                        });
+                      } catch (err) {
+                        alert(err);
+                      }
                     },
                   },
                 },

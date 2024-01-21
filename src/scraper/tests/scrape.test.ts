@@ -91,13 +91,13 @@ describe('format pairings', () => {
   test('missing player (black)', () => {
     const players: Player[] = [{ name: 'A', lichess: 'aaa' }];
     const pairings: Pairing[] = [{ white: 'A', black: 'B' }];
-    expect(() => formatPairings(players, pairings)).toThrow('Could not find in player list: B');
+    expect(() => formatPairings(players, pairings)).toThrow('Name in pairing list but not in player list: B');
   });
 
   test('missing player (white)', () => {
     const players: Player[] = [{ name: 'C', lichess: 'ccc' }];
     const pairings: Pairing[] = [{ white: 'D', black: 'C' }];
-    expect(() => formatPairings(players, pairings)).toThrow('Could not find in player list: D');
+    expect(() => formatPairings(players, pairings)).toThrow('Name in pairing list but not in player list: D');
   });
 });
 
