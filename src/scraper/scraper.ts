@@ -18,7 +18,7 @@ export interface PairingResult {
 }
 
 async function fetchHtml(url: string): Promise<string> {
-  const response = await fetch(`https://corsproxy.io/?${url}`);
+  const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
   return await response.text();
 }
 
