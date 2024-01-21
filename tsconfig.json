@@ -6,6 +6,6 @@
     "moduleResolution": "node",
     "target": "ES2017",
     "module": "esnext",
-    "lib": ["DOM", "ES2019"]
-  }
+    "lib": ["DOM", "ES2019"],
+  },
 }

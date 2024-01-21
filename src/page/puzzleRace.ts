@@ -13,7 +13,10 @@ interface Result {
 
 export class PuzzleRace {
   feedback: Feedback<Result> = undefined;
-  constructor(readonly app: App, readonly me: Me) {}
+  constructor(
+    readonly app: App,
+    readonly me: Me,
+  ) {}
   redraw = () => this.app.redraw(this.render());
   render = () =>
     layout(
@@ -25,12 +28,12 @@ export class PuzzleRace {
           h(
             'a',
             { attrs: { href: 'https://lichess.org/api#tag/Puzzles/operation/racerPost' } },
-            'Lichess puzzle race API'
+            'Lichess puzzle race API',
           ),
           ' to create a private race with an invite link.',
         ]),
         this.renderForm(),
-      ])
+      ]),
     );
 
   private onSubmit = async () => {
@@ -51,7 +54,7 @@ export class PuzzleRace {
     return card(
       result.id,
       ['PuzzleRace #', result.id],
-      [h('h3', 'Link'), copyInput('Invite URL', result.url)]
+      [h('h3', 'Link'), copyInput('Invite URL', result.url)],
     );
   };
 }

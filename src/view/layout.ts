@@ -22,7 +22,7 @@ const renderNavBar = (app: App) =>
             attrs: logoAttrs,
           }),
           'Lichess API',
-        ]
+        ],
       ),
       h(
         'button.navbar-toggler',
@@ -36,7 +36,7 @@ const renderNavBar = (app: App) =>
             'aria-label': 'Toggle navigation',
           },
         },
-        h('span.navbar-toggler-icon')
+        h('span.navbar-toggler-icon'),
       ),
       h('div#navbarSupportedContent.collapse.navbar-collapse', [
         h('ul.navbar-nav.me-auto.mb-lg-0"', []),
@@ -59,7 +59,7 @@ const endpointNav = () =>
             'aria-expanded': false,
           },
         },
-        'Endpoints'
+        'Endpoints',
       ),
       h(
         'ul.dropdown-menu',
@@ -69,8 +69,8 @@ const endpointNav = () =>
           },
         },
         endpoints.map(e =>
-          h('li', h('a.dropdown-item', { attrs: { ...href(e.path), title: e.desc } }, e.name))
-        )
+          h('li', h('a.dropdown-item', { attrs: { ...href(e.path), title: e.desc } }, e.name)),
+        ),
       ),
     ]),
   ]);
@@ -87,7 +87,7 @@ const userNav = (me: Me) =>
           'aria-expanded': false,
         },
       },
-      me.username
+      me.username,
     ),
     h(
       'ul.dropdown-menu',
@@ -104,10 +104,10 @@ const userNav = (me: Me) =>
             {
               attrs: href('/logout'),
             },
-            'Log out'
-          )
+            'Log out',
+          ),
         ),
-      ]
+      ],
     ),
   ]);
 
@@ -119,8 +119,8 @@ const anonNav = () =>
       {
         attrs: href('/login'),
       },
-      'Login with Lichess'
-    )
+      'Login with Lichess',
+    ),
   );
 
 const renderFooter = (app: App) =>
@@ -139,7 +139,7 @@ const renderFooter = (app: App) =>
         ]),
         h('div.col.mb-3', [h('h5', 'Configuration'), h('code', JSON.stringify(app.config, null, 2))]),
       ]),
-    ])
+    ]),
   );
 const linkLi = (href: string, text: string) => h('li.mb-2', h('a', { attrs: { href } }, text));
 

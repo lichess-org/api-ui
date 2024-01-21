@@ -32,13 +32,13 @@ export class OpenChallenge {
           h(
             'a',
             { attrs: { href: 'https://lichess.org/api#tag/Challenges/operation/challengeOpen' } },
-            'Lichess open challenge API'
+            'Lichess open challenge API',
           ),
           ' to create a game that any two players can join.',
         ]),
         h('p', ['No OAuth token is required.']),
         this.renderForm(),
-      ])
+      ]),
     );
 
   private onSubmit = async (data: FormData) => {
@@ -81,7 +81,7 @@ export class OpenChallenge {
         form.input('users', { tpe: 'text' }),
         h(
           'p.form-text',
-          'Optional pair of usernames, separated by a comma. If set, only these users will be allowed to join the game. The first username gets the white pieces.'
+          'Optional pair of usernames, separated by a comma. If set, only these users will be allowed to join the game. The first username gets the white pieces.',
         ),
       ]),
       form.specialRules(gameRulesExceptNoAbort),
@@ -102,7 +102,7 @@ export class OpenChallenge {
               copyInput('Game URL for white', result.urlWhite),
               copyInput('Game URL for black', result.urlBlack),
             ]),
-      ]
+      ],
     );
   };
 }
