@@ -63,24 +63,38 @@ describe('fetch pairings', () => {
   });
 });
 
-test('format pairings', () => {
-  const players: Player[] = [
-    { name: 'A', lichess: 'aaa' },
-    { name: 'B', lichess: 'bbb' },
-    { name: 'C', lichess: 'ccc' },
-    { name: 'D', lichess: 'ddd' },
-  ];
-  const pairings: Pairing[] = [
-    { white: 'A', black: 'B' },
-    { white: 'C', black: 'D' },
-  ];
+describe('format pairings', () => {
+  test('format pairings', () => {
+    const players: Player[] = [
+      { name: 'A', lichess: 'aaa' },
+      { name: 'B', lichess: 'bbb' },
+      { name: 'C', lichess: 'ccc' },
+      { name: 'D', lichess: 'ddd' },
+    ];
+    const pairings: Pairing[] = [
+      { white: 'A', black: 'B' },
+      { white: 'C', black: 'D' },
+    ];
 
-  const pairingResults = formatPairings(players, pairings);
+    const pairingResults = formatPairings(players, pairings);
 
-  expect(pairingResults).toStrictEqual([
-    { white: players[0], black: players[1] },
-    { white: players[2], black: players[3] },
-  ]);
+    expect(pairingResults).toStrictEqual([
+      { white: players[0], black: players[1] },
+      { white: players[2], black: players[3] },
+    ]);
+  });
+
+  test('missing player (black)', () => {
+    const players: Player[] = [{ name: 'A', lichess: 'aaa' }];
+    const pairings: Pairing[] = [{ white: 'A', black: 'B' }];
+    expect(() => formatPairings(players, pairings)).toThrow('Could not find in player list: B');
+  });
+
+  test('missing player (white)', () => {
+    const players: Player[] = [{ name: 'C', lichess: 'ccc' }];
+    const pairings: Pairing[] = [{ white: 'D', black: 'C' }];
+    expect(() => formatPairings(players, pairings)).toThrow('Could not find in player list: D');
+  });
 });
 
 test('set results per page', () => {
