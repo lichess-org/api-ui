@@ -127,21 +127,46 @@ export class ScheduleGames {
       form.feedback(this.feedback),
       isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
       h('div.mb-3', [
-        form.label('Players', 'players'),
-        h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
-          attrs: {
-            name: 'players',
-            style: 'height: 100px',
-            required: true,
-          },
-        }),
-        h('p.form-text', [
-          'Two usernames per line, each line is a game.',
-          h('br'),
-          'First username gets the white pieces, unless randomized by the switch below.',
+        h('div.row', [
+          h('div.col-md-6', [
+            form.label('Players', 'players'),
+            h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
+              attrs: {
+                name: 'players',
+                style: 'height: 100px',
+                required: true,
+              },
+            }),
+            h('p.form-text', [
+              'Two usernames per line, each line is a game.',
+              h('br'),
+              'First username gets the white pieces, unless randomized by the switch below.',
+            ]),
+            h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+          ]),
+          h('div.col-md-6', [
+            h('div.card.card-body', [
+              h('p.text-muted.small', 'Or load the players and pairings from another website:'),
+              h('div.mb-3', [form.label('Players URL', 'cr-players-url'), form.input('cr-players-url')]),
+              h('div.mb-3', [form.label('Pairings URL', 'cr-pairings-url'), form.input('cr-pairings-url')]),
+              h(
+                'button.btn.btn-secondary.btn-sm.mt-3',
+                {
+                  attrs: {
+                    type: 'button',
+                  },
+                  on: {
+                    click: () => {
+                      alert('Not implemented yet');
+                    },
+                  },
+                },
+                'Load pairings',
+              ),
+            ]),
+          ]),
         ]),
       ]),
-      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
       form.clock(),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
       form.variant(),
