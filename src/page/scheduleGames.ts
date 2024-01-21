@@ -139,6 +139,7 @@ export class ScheduleGames {
                 name: 'players',
                 style: 'height: 100px',
                 required: true,
+                spellcheck: 'false',
               },
             }),
             h('p.form-text', [
