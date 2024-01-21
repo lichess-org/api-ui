@@ -6,6 +6,7 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
+import { formatPairings, getPairings, getPlayers } from '../scraper/scraper';
 
 interface Tokens {
   [username: string]: string;
@@ -152,10 +153,14 @@ export class ScheduleGames {
               h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
               h('div.card.card-body.mb-3', [
                 form.label('Players URL', 'cr-players-url'),
-                form.input('cr-players-url'),
+                form.input('cr-players-url', {
+                  value: 'https://chess-results.com/tnr549689.aspx?lan=1&art=16&flag=30',
+                }),
                 h('p.form-text', ['The Lichess username must be in the "Club/City" field.']),
                 form.label('Pairings URL', 'cr-pairings-url'),
-                form.input('cr-pairings-url'),
+                form.input('cr-pairings-url', {
+                  value: 'https://chess-results.com/tnr549689.aspx?lan=1&art=3&rd=1&flag=30',
+                }),
               ]),
               h(
                 'button.btn.btn-secondary.btn-sm.mt-3',
@@ -164,8 +169,26 @@ export class ScheduleGames {
                     type: 'button',
                   },
                   on: {
-                    click: () => {
-                      alert('Not implemented yet');
+                    click: async () => {
+                      const playersUrl = (document.getElementById('cr-players-url') as HTMLInputElement)
+                        .value;
+                      const pairingsUrl = (document.getElementById('cr-pairings-url') as HTMLInputElement)
+                        .value;
+                      if (!playersUrl || !pairingsUrl) return;
+
+                      const players = await getPlayers(playersUrl);
+                      const pairings = await getPairings(pairingsUrl);
+
+                      formatPairings(players, pairings).forEach(pairing => {
+                        const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+
+                        const white = pairing.white.lichess || `<${pairing.white.name}>`;
+                        const black = pairing.black.lichess || `<${pairing.black.name}>`;
+
+                        const newLine = `${white} ${black}`;
+                        (document.getElementById('players') as HTMLTextAreaElement).value =
+                          playersTxt + (playersTxt ? '\n' : '') + newLine;
+                      });
                     },
                   },
                 },

@@ -30,7 +30,7 @@
     "build": "rollup --config",
     "watch": "rollup --config --watch",
     "prod": "rollup --config --config-prod",
-    "serve": "http-server",
+    "serve": "http-server --cors",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest"
