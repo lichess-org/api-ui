@@ -17,8 +17,8 @@ export class Home {
         h('a.list-group-item.list-group-item-action', { attrs: href(e.path) }, [
           h('h3', e.name),
           h('span', e.desc),
-        ])
-      )
+        ]),
+      ),
     );
 
   renderAbout = () =>

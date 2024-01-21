@@ -24,7 +24,10 @@ interface Result {
 export class ScheduleGames {
   feedback: Feedback<Result> = undefined;
   lichessUrl: string;
-  constructor(readonly app: App, readonly me: Me) {
+  constructor(
+    readonly app: App,
+    readonly me: Me,
+  ) {
     this.lichessUrl = app.config.lichessHost;
   }
   redraw = () => this.app.redraw(this.render());
@@ -38,7 +41,7 @@ export class ScheduleGames {
           h(
             'a',
             { attrs: { href: 'https://lichess.org/api#tag/Bulk-pairings/operation/bulkPairingCreate' } },
-            'Lichess bulk pairing API'
+            'Lichess bulk pairing API',
           ),
           ' to create a bunch of games at once.',
         ]),
@@ -48,7 +51,7 @@ export class ScheduleGames {
           ' permission to generate the player challenge tokens automatically.',
         ]),
         this.renderForm(isSuccess(this.feedback) ? this.feedback.result.id : undefined),
-      ])
+      ]),
     );
 
   private onSubmit = async (form: FormData) => {
@@ -65,7 +68,7 @@ export class ScheduleGames {
             line
               .trim()
               .replace(/[\s,]+/g, ' ')
-              .split(' ')
+              .split(' '),
           )
           .map(names => [names[0].trim(), names[1].trim()]);
       } catch (err) {
@@ -81,7 +84,7 @@ export class ScheduleGames {
               if (!tokens[name]) throw `Missing token for ${name}, is that an active Lichess player?`;
               return tokens[name];
             })
-            .sort(sortFn) as [string, string]
+            .sort(sortFn) as [string, string],
       );
       const rules = gameRuleKeys.filter(key => !!get(key));
       const req = this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
@@ -188,7 +191,7 @@ export class ScheduleGames {
               style: 'height: 100px',
             },
           },
-          'Your game with {opponent} is ready: {game}.'
+          'Your game with {opponent} is ready: {game}.',
         ),
         h('p.form-text', [
           'Message that will be sent to each player, when the game is created. It is sent from your user account.',
@@ -257,9 +260,9 @@ export class ScheduleGames {
                 h('td', lichessLink(`@/${game.white}`, game.white)),
                 h('td', lichessLink(`@/${game.black}`, game.black)),
               ]);
-            })
+            }),
           ),
         ]),
-      ]
+      ],
     );
 }
