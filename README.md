@@ -11,3 +11,11 @@ Some web UIs for [the Lichess API](https://lichess.org/api)
 1. `pnpm install`
 1. `pnpm run build`
 1. `pnpm run serve` or any other method to serve the app on http://localhost:8000
+
+## Tests
+
+```bash
+pnpm test
+## or
+pnpm test:watch
+```
