@@ -172,7 +172,6 @@ export class ScheduleGames {
                         },
                       });
                       const users = await res.json();
-                      console.log(users);
                       validUsernames = validUsernames.concat(users.map((user: any) => user.id));
                     }
 
