@@ -3,11 +3,15 @@ import { readFileSync } from 'fs';
 import { getPlayers, getPairings, Player, Pairing, formatPairings, setResultsPerPage } from '../scraper';
 
 global.fetch = vi.fn(url => {
-  if (url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-club-city.html%3Fzeilen%3D99999') {
+  if (
+    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-club-city.html%3Fzeilen%3D99999'
+  ) {
     return Promise.resolve({
       text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-with-club-city.html')),
     });
-  } else if (url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-teams.html%3Fzeilen%3D99999') {
+  } else if (
+    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-teams.html%3Fzeilen%3D99999'
+  ) {
     return Promise.resolve({
       text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-with-teams.html')),
     });

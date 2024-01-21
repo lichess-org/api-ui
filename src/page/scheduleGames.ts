@@ -147,7 +147,48 @@ export class ScheduleGames {
               h('br'),
               'First username gets the white pieces, unless randomized by the switch below.',
             ]),
-            h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+            h('div.form-check.form-switch', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+            h(
+              'button.btn.btn-secondary.btn-sm.mt-2',
+              {
+                attrs: {
+                  type: 'button',
+                },
+                on: {
+                  click: async () => {
+                    const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+                    const usernames = playersTxt.match(/(<.*?>)|(\S+)/g);
+                    if (!usernames) return;
+
+                    let validUsernames: string[] = [];
+
+                    const chunkSize = 300;
+                    for (let i = 0; i < usernames.length; i += chunkSize) {
+                      const res = await this.me.httpClient(`${this.lichessUrl}/api/users`, {
+                        method: 'POST',
+                        body: usernames.slice(i, i + chunkSize).join(', '),
+                        headers: {
+                          'Content-Type': 'text/plain',
+                        },
+                      });
+                      const users = await res.json();
+                      console.log(users);
+                      validUsernames = validUsernames.concat(users.map((user: any) => user.id));
+                    }
+
+                    const invalidUsernames = usernames.filter(
+                      username => !validUsernames.includes(username.toLowerCase()),
+                    );
+                    if (invalidUsernames.length) {
+                      alert(`Invalid usernames: ${invalidUsernames.join(', ')}`);
+                    } else {
+                      alert('All usernames are valid!');
+                    }
+                  },
+                },
+              },
+              'Validate Lichess usernames',
+            ),
           ]),
           h('div.col-md-6', [
             h('details', [
