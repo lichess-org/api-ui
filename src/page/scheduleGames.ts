@@ -148,14 +148,12 @@ export class ScheduleGames {
             h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
           ]),
           h('div.col-md-6', [
-            h('div.card.card-body', [
-              h('p.text-muted.small', 'Or load the players and pairings from another website:'),
-              h('div.mb-3', [
+            h('details', [
+              h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
+              h('div.card.card-body.mb-3', [
                 form.label('Players URL', 'cr-players-url'),
                 form.input('cr-players-url'),
-                h('p.form-text', [
-                  'Lichess username must be in the "Club/City" field.',
-                ]),
+                h('p.form-text', ['The Lichess username must be in the "Club/City" field.']),
                 form.label('Pairings URL', 'cr-pairings-url'),
                 form.input('cr-pairings-url'),
               ]),
