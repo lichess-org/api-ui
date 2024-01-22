@@ -29,14 +29,16 @@ export async function getPlayers(url: string): Promise<Player[]> {
   const $ = cheerio.load(html);
   const players: Player[] = [];
 
-  let headers: string[] = [];
+  const headers: string[] = $('.CRs1 tr th')
+    .first()
+    .parent()
+    .children()
+    .map((_index, element) => $(element).text().trim())
+    .get();
 
-  $('.CRs1 tr').each((index, element) => {
-    if (index === 0) {
-      headers = $(element)
-        .children()
-        .map((_index, element) => $(element).text().trim())
-        .get();
+  $('.CRs1 tr').each((_index, element) => {
+    // ignore heading rows
+    if ($(element).find('th').length > 0) {
       return;
     }
 
@@ -78,7 +80,7 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
   const $ = cheerio.load(html);
   const pairings: Pairing[] = [];
 
-  const headerRow = $('.CRs1 tr th')
+  const headers: string[] = $('.CRs1 tr th')
     .first()
     .parent()
     .children()
@@ -94,18 +96,18 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
     const white = $(element).find('table').find('div.FarbewT').parentsUntil('table').last().text().trim();
     const black = $(element).find('table').find('div.FarbesT').parentsUntil('table').last().text().trim();
 
-    const rating1 = headerRow.includes('Rtg')
-      ? parseInt($(element).children().eq(headerRow.indexOf('Rtg')).text().trim())
+    const rating1 = headers.includes('Rtg')
+      ? parseInt($(element).children().eq(headers.indexOf('Rtg')).text().trim())
       : undefined;
-    const rating2 = headerRow.includes('Rtg')
-      ? parseInt($(element).children().eq(headerRow.lastIndexOf('Rtg')).text().trim())
+    const rating2 = headers.includes('Rtg')
+      ? parseInt($(element).children().eq(headers.lastIndexOf('Rtg')).text().trim())
       : undefined;
 
-    const username1 = headerRow.includes('Club/City')
-      ? $(element).children().eq(headerRow.indexOf('Club/City')).text().trim()
+    const username1 = headers.includes('Club/City')
+      ? $(element).children().eq(headers.indexOf('Club/City')).text().trim()
       : undefined;
-    const username2 = headerRow.includes('Club/City')
-      ? $(element).children().eq(headerRow.lastIndexOf('Club/City')).text().trim()
+    const username2 = headers.includes('Club/City')
+      ? $(element).children().eq(headers.lastIndexOf('Club/City')).text().trim()
       : undefined;
 
     // which color indicator comes first: div.FarbewT or div.FarbesT?
@@ -149,7 +151,7 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
   const $ = cheerio.load(html);
   const pairings: Pairing[] = [];
 
-  const headerRow = $('.CRs1 tr th')
+  const headers: string[] = $('.CRs1 tr th')
     .first()
     .parent()
     .children()
@@ -157,13 +159,13 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
     .get();
 
   $('.CRs1 tr').each((_index, element) => {
-    // ignore rows with less than 2 <td>'s
+    // ignore certain table headings: rows with less than 2 <td>'s
     if ($(element).find('td').length < 2) {
       return;
     }
 
-    const whiteName = $(element).children().eq(headerRow.indexOf('Name')).text().trim();
-    const blackName = $(element).children().eq(headerRow.lastIndexOf('Name')).text().trim();
+    const whiteName = $(element).children().eq(headers.indexOf('Name')).text().trim();
+    const blackName = $(element).children().eq(headers.lastIndexOf('Name')).text().trim();
 
     pairings.push({
       white: players?.find(player => player.name === whiteName) ?? { name: whiteName },
