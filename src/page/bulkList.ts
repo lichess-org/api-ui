@@ -3,23 +3,9 @@ import { App } from '../app';
 import { Me } from '../auth';
 import layout from '../view/layout';
 import { timeFormat } from '../view/util';
-
-interface Bulk {
-  id: string;
-  games: Game[];
-  variant: string;
-  rated: boolean;
-  pairAt: Date;
-  startClocksAt?: Date;
-  scheduledAt: Date;
-  pairedAt?: Date;
-}
-interface Game {
-  id: string;
-  white: Username;
-  black: Username;
-}
-type Username = string;
+import { Bulk } from '../model';
+import { href } from '../routing';
+import { bulkPairing } from '../endpoints';
 
 export class BulkList {
   lichessUrl: string;
@@ -68,7 +54,7 @@ export class BulkList {
                 'tbody',
                 this.bulks!.map(bulk =>
                   h('tr', [
-                    h('td', h('a', '#' + bulk.id)),
+                    h('td', h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, `#${bulk.id}`)),
                     h('td', bulk.games.length),
                     h('td', bulk.variant),
                     h('td', bulk.rated ? 'Rated' : 'Casual'),

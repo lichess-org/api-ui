@@ -6,6 +6,7 @@ import { OpenChallenge } from './page/openChallenge';
 import { PuzzleRace } from './page/puzzleRace';
 import { BulkList } from './page/bulkList';
 import { Me } from './auth';
+import { BulkShow } from './page/bulkShow';
 
 export default function (app: App) {
   const withAuth = (f: (me: Me) => void) => {
@@ -29,6 +30,7 @@ export default function (app: App) {
   page('/endpoint/open-challenge', _ => new OpenChallenge(app).redraw());
   page('/endpoint/schedule-games', _ => withAuth(me => new BulkList(app, me).redraw()));
   page('/endpoint/schedule-games/new', _ => withAuth(me => new ScheduleGames(app, me).redraw()));
+  page('/endpoint/schedule-games/:id', ctx => withAuth(me => new BulkShow(app, me, ctx.params.id).redraw()));
   page('/endpoint/puzzle-race', _ => withAuth(me => new PuzzleRace(app, me).redraw()));
   page('/too-many-requests', _ => app.tooManyRequests());
   page('*', _ => app.notFound());
