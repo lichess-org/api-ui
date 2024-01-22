@@ -168,35 +168,8 @@ export class ScheduleGames {
                   type: 'button',
                 },
                 on: {
-                  click: async () => {
-                    const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
-                    const usernames = playersTxt.match(/(<.*?>)|(\S+)/g);
-                    if (!usernames) return;
-
-                    let validUsernames: string[] = [];
-
-                    const chunkSize = 300;
-                    for (let i = 0; i < usernames.length; i += chunkSize) {
-                      const res = await this.me.httpClient(`${this.lichessUrl}/api/users`, {
-                        method: 'POST',
-                        body: usernames.slice(i, i + chunkSize).join(', '),
-                        headers: {
-                          'Content-Type': 'text/plain',
-                        },
-                      });
-                      const users = await res.json();
-                      validUsernames = validUsernames.concat(users.map((user: any) => user.id));
-                    }
-
-                    const invalidUsernames = usernames.filter(
-                      username => !validUsernames.includes(username.toLowerCase()),
-                    );
-                    if (invalidUsernames.length) {
-                      alert(`Invalid usernames: ${invalidUsernames.join(', ')}`);
-                    } else {
-                      alert('All usernames are valid!');
-                    }
-                  },
+                  click: () =>
+                    this.validateUsernames(document.getElementById('players') as HTMLTextAreaElement),
                 },
               },
               'Validate Lichess usernames',
@@ -229,21 +202,11 @@ export class ScheduleGames {
                     type: 'button',
                   },
                   on: {
-                    click: async () => {
-                      try {
-                        const pairingsUrl = (document.getElementById('cr-pairings-url') as HTMLInputElement)
-                          .value;
-                        const playersUrl = (document.getElementById('cr-players-url') as HTMLInputElement)
-                          .value;
-
-                        const players = playersUrl ? await getPlayers(playersUrl) : undefined;
-
-                        const pairings = await getPairings(pairingsUrl, players);
-                        this.insertPairings(pairings);
-                      } catch (err) {
-                        alert(err);
-                      }
-                    },
+                    click: () =>
+                      this.loadPairingsFromChessResults(
+                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                      ),
                   },
                 },
                 'Load pairings',
@@ -340,4 +303,48 @@ export class ScheduleGames {
         ]),
       ],
     );
+
+  private validateUsernames = async (textarea: HTMLTextAreaElement) => {
+    const usernames = textarea.value.match(/(<.*?>)|(\S+)/g);
+    if (!usernames) return;
+
+    let validUsernames: string[] = [];
+
+    const chunkSize = 300;
+    for (let i = 0; i < usernames.length; i += chunkSize) {
+      const res = await this.me.httpClient(`${this.lichessUrl}/api/users`, {
+        method: 'POST',
+        body: usernames.slice(i, i + chunkSize).join(', '),
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+      const users = await res.json();
+      validUsernames = validUsernames.concat(users.map((user: any) => user.id));
+    }
+
+    const invalidUsernames = usernames.filter(username => !validUsernames.includes(username.toLowerCase()));
+    if (invalidUsernames.length) {
+      alert(`Invalid usernames: ${invalidUsernames.join(', ')}`);
+    } else {
+      alert('All usernames are valid!');
+    }
+  };
+
+  private loadPairingsFromChessResults = async (
+    pairingsInput: HTMLInputElement,
+    playersInput: HTMLInputElement,
+  ) => {
+    try {
+      const pairingsUrl = pairingsInput.value;
+      const playersUrl = playersInput.value;
+
+      const players = playersUrl ? await getPlayers(playersUrl) : undefined;
+
+      const pairings = await getPairings(pairingsUrl, players);
+      this.insertPairings(pairings);
+    } catch (err) {
+      alert(err);
+    }
+  };
 }
