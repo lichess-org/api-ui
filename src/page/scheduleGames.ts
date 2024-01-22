@@ -181,9 +181,7 @@ export class ScheduleGames {
               h('div.card.card-body.mb-3', [
                 h('div.form-group.mb-3', [
                   form.label('Pairings URL', 'cr-pairings-url'),
-                  form.input('cr-pairings-url', {
-                    value: 'https://chess-results.com/tnr881769.aspx?lan=1&art=3',
-                  }),
+                  form.input('cr-pairings-url'),
                 ]),
                 h('div.form-group', [
                   form.label('Players URL', 'cr-players-url'),
