@@ -6,7 +6,7 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
-import { formatPairings, getPairings, getPlayers } from '../scraper/scraper';
+import { Pairing, getPairings, getPairingsForTeamSwiss, getPlayers } from '../scraper/scraper';
 
 interface Tokens {
   [username: string]: string;
@@ -126,6 +126,19 @@ export class ScheduleGames {
     return json;
   };
 
+  private insertPairings(pairings: Pairing[]) {
+    pairings.forEach(pairing => {
+      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+
+      const white = pairing.white.lichess || `<${pairing.white.name}>`;
+      const black = pairing.black.lichess || `<${pairing.black.name}>`;
+
+      const newLine = `${white} ${black}`;
+      (document.getElementById('players') as HTMLTextAreaElement).value =
+        playersTxt + (playersTxt ? '\n' : '') + newLine;
+    });
+  }
+
   private renderForm = (lastId?: string) =>
     form.form(this.onSubmit, [
       form.feedback(this.feedback),
@@ -193,15 +206,21 @@ export class ScheduleGames {
             h('details', [
               h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
               h('div.card.card-body.mb-3', [
-                form.label('Players URL', 'cr-players-url'),
-                form.input('cr-players-url', {
-                  value: 'https://chess-results.com/tnr549689.aspx?lan=1&art=16&flag=30',
-                }),
-                h('p.form-text', ['The Lichess username must be in the "Club/City" field.']),
-                form.label('Pairings URL', 'cr-pairings-url'),
-                form.input('cr-pairings-url', {
-                  value: 'https://chess-results.com/tnr549689.aspx?lan=1&art=3&rd=1&flag=30',
-                }),
+                h('div.form-group.mb-3', [
+                  form.label('Pairings URL', 'cr-pairings-url'),
+                  form.input('cr-pairings-url', {
+                    value: 'https://chess-results.com/tnr881769.aspx?lan=1&art=3',
+                  }),
+                ]),
+                h('div.form-group', [
+                  form.label('Players URL', 'cr-players-url'),
+                  form.input('cr-players-url'),
+                  h('p.form-text', [
+                    'Only add this URL if the usernames are not provided on the Pairings page.',
+                    h('br'),
+                    'The Lichess username must be in the "Club/City" field.',
+                  ]),
+                ]),
               ]),
               h(
                 'button.btn.btn-secondary.btn-sm.mt-3',
@@ -211,27 +230,20 @@ export class ScheduleGames {
                   },
                   on: {
                     click: async () => {
-                      const playersUrl = (document.getElementById('cr-players-url') as HTMLInputElement)
-                        .value;
-                      const pairingsUrl = (document.getElementById('cr-pairings-url') as HTMLInputElement)
-                        .value;
-                      if (!playersUrl || !pairingsUrl) return;
-
-                      const players = await getPlayers(playersUrl);
-                      const pairings = await getPairings(pairingsUrl);
-
                       try {
-                        formatPairings(players, pairings).forEach(pairing => {
-                          const playersTxt = (document.getElementById('players') as HTMLTextAreaElement)
-                            .value;
+                        const pairingsUrl = (document.getElementById('cr-pairings-url') as HTMLInputElement)
+                          .value;
+                        const playersUrl = (document.getElementById('cr-players-url') as HTMLInputElement)
+                          .value;
 
-                          const white = pairing.white.lichess || `<${pairing.white.name}>`;
-                          const black = pairing.black.lichess || `<${pairing.black.name}>`;
-
-                          const newLine = `${white} ${black}`;
-                          (document.getElementById('players') as HTMLTextAreaElement).value =
-                            playersTxt + (playersTxt ? '\n' : '') + newLine;
-                        });
+                        if (pairingsUrl && !playersUrl) {
+                          const pairings = await getPairingsForTeamSwiss(pairingsUrl);
+                          this.insertPairings(pairings);
+                        } else if (pairingsUrl && playersUrl) {
+                          const players = await getPlayers(playersUrl);
+                          const pairings = await getPairings(pairingsUrl, players);
+                          this.insertPairings(pairings);
+                        }
                       } catch (err) {
                         alert(err);
                       }
