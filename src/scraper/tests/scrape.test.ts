@@ -2,53 +2,13 @@ import { describe, expect, test, vi, Mock } from 'vitest';
 import { readFileSync } from 'fs';
 import { getPlayers, getPairings, setResultsPerPage, Player } from '../scraper';
 
-global.fetch = vi.fn(url => {
-  if (
-    url ==
-    'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-list-with-usernames.html%3Fzeilen%3D99999'
-  ) {
-    return Promise.resolve({
-      text: () =>
-        Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-list-with-usernames.html')),
-    });
-  } else if (
-    url ==
-    'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-list-without-usernames.html%3Fzeilen%3D99999'
-  ) {
-    return Promise.resolve({
-      text: () =>
-        Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-list-without-usernames.html')),
-    });
-  } else if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fteam-swiss-pairings-without-usernames.html'
-  ) {
-    return Promise.resolve({
-      text: () =>
-        Promise.resolve(
-          readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-without-usernames.html'),
-        ),
-    });
-  } else if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fteam-swiss-pairings-with-usernames.html'
-  ) {
-    return Promise.resolve({
-      text: () =>
-        Promise.resolve(readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-with-usernames.html')),
-    });
-  } else if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Findividual-round-robin-pairings.html'
-  ) {
-    return Promise.resolve({
-      text: () =>
-        Promise.resolve(readFileSync('src/scraper/tests/fixtures/individual-round-robin-pairings.html')),
-    });
-  } else if (url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Findividual-swiss-pairings.html') {
-    return Promise.resolve({
-      text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/individual-swiss-pairings.html')),
-    });
-  }
+global.fetch = vi.fn(proxyUrl => {
+  let url = new URL(decodeURIComponent(proxyUrl.split('?')[1]));
+  let path = url.pathname;
 
-  throw new Error(`Unexpected URL: ${url}`);
+  return Promise.resolve({
+    text: () => Promise.resolve(readFileSync(`src/scraper/tests/fixtures${path}`)),
+  });
 }) as Mock;
 
 describe('fetch players', () => {
@@ -268,6 +228,7 @@ describe('fetch pairings', () => {
 });
 
 test('set results per page', () => {
+  expect(setResultsPerPage('https://example.com')).toBe('https://example.com/?zeilen=99999');
   expect(setResultsPerPage('https://example.com', 10)).toBe('https://example.com/?zeilen=10');
   expect(setResultsPerPage('https://example.com/?foo=bar', 10)).toBe(
     'https://example.com/?foo=bar&zeilen=10',
