@@ -8,6 +8,28 @@ Some web UIs for [the Lichess API](https://lichess.org/api)
 
 ## Run it on your machine
 
-1. `pnpm install`
-1. `pnpm run build`
-1. `pnpm run serve` or any other method to serve the app on http://localhost:8000
+```bash
+pnpm install
+pnpm build # or pnpm watch
+pnpm serve
+```
+
+## Tests
+
+```bash
+pnpm test
+## or
+pnpm test:watch
+```
+
+## Using a development instance of Lila
+
+Open the browser console and run:
+
+```js
+localStorage.setItem('lichessHost', 'http://localhost:8080');
+```
+
+Modify the CSP meta tag in `index.html` to add that domain. For example, change `lichess.org` to `localhost:8080`.
+
+Refresh and verify the configuration value in the footer.
