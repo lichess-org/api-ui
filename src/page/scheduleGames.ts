@@ -6,7 +6,7 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
-import { Pairing, getPairings, getPairingsForTeamSwiss, getPlayers } from '../scraper/scraper';
+import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
 
 interface Tokens {
   [username: string]: string;
@@ -216,9 +216,9 @@ export class ScheduleGames {
                   form.label('Players URL', 'cr-players-url'),
                   form.input('cr-players-url'),
                   h('p.form-text', [
-                    'Only add this URL if the usernames are not provided on the Pairings page.',
+                    'Only required if the usernames are not provided on the Pairings page.',
                     h('br'),
-                    'The Lichess username must be in the "Club/City" field.',
+                    'The Lichess usernames must be in the "Club/City" field.',
                   ]),
                 ]),
               ]),
@@ -236,14 +236,10 @@ export class ScheduleGames {
                         const playersUrl = (document.getElementById('cr-players-url') as HTMLInputElement)
                           .value;
 
-                        if (pairingsUrl && !playersUrl) {
-                          const pairings = await getPairingsForTeamSwiss(pairingsUrl);
-                          this.insertPairings(pairings);
-                        } else if (pairingsUrl && playersUrl) {
-                          const players = await getPlayers(playersUrl);
-                          const pairings = await getPairings(pairingsUrl, players);
-                          this.insertPairings(pairings);
-                        }
+                        const players = playersUrl ? await getPlayers(playersUrl) : undefined;
+
+                        const pairings = await getPairings(pairingsUrl, players);
+                        this.insertPairings(pairings);
                       } catch (err) {
                         alert(err);
                       }

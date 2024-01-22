@@ -25,8 +25,8 @@ export function setResultsPerPage(url: string, resultsPerPage: number = 99999): 
 }
 
 export async function getPlayers(url: string): Promise<Player[]> {
-  const response = await fetchHtml(setResultsPerPage(url));
-  const $ = cheerio.load(response);
+  const html = await fetchHtml(setResultsPerPage(url));
+  const $ = cheerio.load(html);
   const players: Player[] = [];
 
   let headers: string[] = [];
@@ -62,32 +62,20 @@ export async function getPlayers(url: string): Promise<Player[]> {
   return players;
 }
 
-export async function getPairings(url: string, players: Player[]): Promise<Pairing[]> {
-  const response = await fetchHtml(url);
-  const $ = cheerio.load(response);
-  const pairings: Pairing[] = [];
+export async function getPairings(url: string, players?: Player[]): Promise<Pairing[]> {
+  const html = await fetchHtml(url);
+  const $ = cheerio.load(html);
 
-  $('.CRs1 tr').each((_index, element) => {
-    // ignore rows that do not have pairings
-    if ($(element).find('table').length === 0) {
-      return;
-    }
+  // Team Swiss pairings table has nested tables
+  if ($('.CRs1 td').find('table').length > 1) {
+    return parsePairingsForTeamSwiss(html);
+  }
 
-    const whiteName = $(element).find('table').find('div.FarbewT').parentsUntil('table').last().text().trim();
-    const blackName = $(element).find('table').find('div.FarbesT').parentsUntil('table').last().text().trim();
-
-    pairings.push({
-      white: players.find(player => player.name === whiteName) || { name: whiteName },
-      black: players.find(player => player.name === blackName) || { name: blackName },
-    });
-  });
-
-  return pairings;
+  return parsePairingsForIndividualEvent(html, players);
 }
 
-export async function getPairingsForTeamSwiss(url: string): Promise<Pairing[]> {
-  const response = await fetchHtml(url);
-  const $ = cheerio.load(response);
+function parsePairingsForTeamSwiss(html: string): Pairing[] {
+  const $ = cheerio.load(html);
   const pairings: Pairing[] = [];
 
   const headerRow = $('.CRs1 tr th')
@@ -96,10 +84,6 @@ export async function getPairingsForTeamSwiss(url: string): Promise<Pairing[]> {
     .children()
     .map((_index, element) => $(element).text().trim())
     .get();
-
-  if (!headerRow.includes('Club/City')) {
-    throw new Error('Pairings table does not contain Lichess usernames');
-  }
 
   $('.CRs1 tr').each((_index, element) => {
     // ignore rows that do not have pairings
@@ -110,11 +94,19 @@ export async function getPairingsForTeamSwiss(url: string): Promise<Pairing[]> {
     const white = $(element).find('table').find('div.FarbewT').parentsUntil('table').last().text().trim();
     const black = $(element).find('table').find('div.FarbesT').parentsUntil('table').last().text().trim();
 
-    const rating1 = $(element).children().eq(headerRow.indexOf('Rtg')).text().trim();
-    const rating2 = $(element).children().eq(headerRow.lastIndexOf('Rtg')).text().trim();
+    const rating1 = headerRow.includes('Rtg')
+      ? parseInt($(element).children().eq(headerRow.indexOf('Rtg')).text().trim())
+      : undefined;
+    const rating2 = headerRow.includes('Rtg')
+      ? parseInt($(element).children().eq(headerRow.lastIndexOf('Rtg')).text().trim())
+      : undefined;
 
-    const username1 = $(element).children().eq(headerRow.indexOf('Club/City')).text().trim();
-    const username2 = $(element).children().eq(headerRow.lastIndexOf('Club/City')).text().trim();
+    const username1 = headerRow.includes('Club/City')
+      ? $(element).children().eq(headerRow.indexOf('Club/City')).text().trim()
+      : undefined;
+    const username2 = headerRow.includes('Club/City')
+      ? $(element).children().eq(headerRow.lastIndexOf('Club/City')).text().trim()
+      : undefined;
 
     // which color indicator comes first: div.FarbewT or div.FarbesT?
     const firstDiv = $(element).find('table').find('div.FarbewT, div.FarbesT').first();
@@ -123,12 +115,12 @@ export async function getPairingsForTeamSwiss(url: string): Promise<Pairing[]> {
       pairings.push({
         white: {
           name: white,
-          rating: parseInt(rating1),
+          rating: rating1,
           lichess: username1,
         },
         black: {
           name: black,
-          rating: parseInt(rating2),
+          rating: rating2,
           lichess: username2,
         },
       });
@@ -136,18 +128,54 @@ export async function getPairingsForTeamSwiss(url: string): Promise<Pairing[]> {
       pairings.push({
         white: {
           name: white,
-          rating: parseInt(rating2),
+          rating: rating2,
           lichess: username2,
         },
         black: {
           name: black,
-          rating: parseInt(rating1),
+          rating: rating1,
           lichess: username1,
         },
       });
     } else {
       throw new Error('Could not parse Pairings table');
     }
+  });
+
+  return pairings;
+}
+
+function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pairing[] {
+  const $ = cheerio.load(html);
+  const pairings: Pairing[] = [];
+
+  const headerRow = $('.CRs1 tr th')
+    .first()
+    .parent()
+    .children()
+    .map((_index, element) => $(element).text().trim())
+    .get();
+
+  $('.CRs1 tr').each((_index, element) => {
+    // ignore rows with less than 2 <td>'s
+    if ($(element).find('td').length < 2) {
+      return;
+    }
+
+    pairings.push({
+      white: {
+        name: $(element).children().eq(headerRow.indexOf('Name')).text().trim(),
+        rating: headerRow.includes('Rtg')
+          ? parseInt($(element).children().eq(headerRow.indexOf('Rtg')).text().trim())
+          : undefined,
+      },
+      black: {
+        name: $(element).children().eq(headerRow.lastIndexOf('Name')).text().trim(),
+        rating: headerRow.includes('Rtg')
+          ? parseInt($(element).children().eq(headerRow.lastIndexOf('Rtg')).text().trim())
+          : undefined,
+      },
+    });
   });
 
   return pairings;

@@ -1,6 +1,6 @@
 import { describe, expect, test, vi, Mock } from 'vitest';
 import { readFileSync } from 'fs';
-import { getPlayers, getPairings, setResultsPerPage, getPairingsForTeamSwiss, Player } from '../scraper';
+import { getPlayers, getPairings, setResultsPerPage, Player } from '../scraper';
 
 global.fetch = vi.fn(url => {
   if (
@@ -35,6 +35,17 @@ global.fetch = vi.fn(url => {
       text: () =>
         Promise.resolve(readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-with-usernames.html')),
     });
+  } else if (
+    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Findividual-round-robin-pairings.html'
+  ) {
+    return Promise.resolve({
+      text: () =>
+        Promise.resolve(readFileSync('src/scraper/tests/fixtures/individual-round-robin-pairings.html')),
+    });
+  } else if (url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Findividual-swiss-pairings.html') {
+    return Promise.resolve({
+      text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/individual-swiss-pairings.html')),
+    });
   }
 
   throw new Error(`Unexpected URL: ${url}`);
@@ -68,9 +79,7 @@ describe('fetch players', () => {
 
 describe('fetch pairings', () => {
   test('team swiss', async () => {
-    const pairings = await getPairingsForTeamSwiss(
-      'https://example.com/team-swiss-pairings-with-usernames.html',
-    );
+    const pairings = await getPairings('https://example.com/team-swiss-pairings-with-usernames.html');
 
     expect(pairings).toHaveLength(8);
     expect(pairings).toStrictEqual([
@@ -174,64 +183,63 @@ describe('fetch pairings', () => {
   });
 
   test('team swiss w/o lichess usernames on the same page', async () => {
-    const players: Player[] = [
-      {
-        name: 'Berend Elvira',
-        fideId: '123',
-        lichess: 'test-elvira',
-      },
-      {
-        name: 'Nepomniachtchi Ian',
-        fideId: '456',
-        lichess: 'test-ian',
-      },
-      {
-        name: 'Sebe-Vodislav Razvan-Alexandru',
-        fideId: '789',
-        lichess: 'test-razvan',
-      },
-      {
-        name: 'Kadatsky Alexander',
-        fideId: '012',
-        lichess: 'test-alexander',
-      },
-    ];
-    const pairings = await getPairings(
-      'https://example.com/team-swiss-pairings-without-usernames.html',
-      players,
-    );
+    const pairings = await getPairings('https://example.com/team-swiss-pairings-without-usernames.html');
 
     expect(pairings).toHaveLength(76);
     expect(pairings[0]).toEqual({
       white: {
         name: 'Berend Elvira',
-        fideId: '123',
-        lichess: 'test-elvira',
+        rating: 2326,
+        lichess: undefined,
       },
       black: {
         name: 'Nepomniachtchi Ian',
-        fideId: '456',
-        lichess: 'test-ian',
+        rating: 2789,
+        lichess: undefined,
       },
     });
     expect(pairings[1]).toEqual({
       black: {
         name: 'Sebe-Vodislav Razvan-Alexandru',
-        fideId: '789',
-        lichess: 'test-razvan',
+        rating: 2270,
+        lichess: undefined,
       },
       white: {
         name: 'Kadatsky Alexander',
-        fideId: '012',
-        lichess: 'test-alexander',
+        rating: 2368,
+        lichess: undefined,
       },
     });
-    expect(pairings[2]).toEqual({
+  });
+
+  test('individual round robin', async () => {
+    const pairings = await getPairings('https://example.com/individual-round-robin-pairings.html');
+
+    expect(pairings).toHaveLength(28);
+    expect(pairings[0]).toEqual({
       white: {
-        name: 'Stanic Zoran',
+        name: 'Ponkratov, Pavel',
+        rating: 2586,
       },
       black: {
-        name: 'Lavrov Maxim',
+        name: 'Galaktionov, Artem',
+        rating: 2379,
+      },
+    });
+  });
+
+  test('individual swiss', async () => {
+    const pairings = await getPairings('https://example.com/individual-swiss-pairings.html');
+
+    expect(pairings).toHaveLength(59);
+    expect(pairings[0]).toEqual({
+      white: {
+        name: 'Gunina, Valentina',
+        rating: 2348,
+      },
+      black: {
+        name: 'Mammadzada, Gunay',
+        rating: 2408,
       },
     });
   });
