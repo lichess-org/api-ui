@@ -6,6 +6,7 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
+import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
 
 interface Tokens {
   [username: string]: string;
@@ -125,26 +126,93 @@ export class ScheduleGames {
     return json;
   };
 
+  private insertPairings(pairings: Pairing[]) {
+    pairings.forEach(pairing => {
+      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+
+      const white = pairing.white.lichess || `<${pairing.white.name}>`;
+      const black = pairing.black.lichess || `<${pairing.black.name}>`;
+
+      const newLine = `${white} ${black}`;
+      (document.getElementById('players') as HTMLTextAreaElement).value =
+        playersTxt + (playersTxt ? '\n' : '') + newLine;
+    });
+  }
+
   private renderForm = (lastId?: string) =>
     form.form(this.onSubmit, [
       form.feedback(this.feedback),
       isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
       h('div.mb-3', [
-        form.label('Players', 'players'),
-        h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
-          attrs: {
-            name: 'players',
-            style: 'height: 100px',
-            required: true,
-          },
-        }),
-        h('p.form-text', [
-          'Two usernames per line, each line is a game.',
-          h('br'),
-          'First username gets the white pieces, unless randomized by the switch below.',
+        h('div.row', [
+          h('div.col-md-6', [
+            form.label('Players', 'players'),
+            h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
+              attrs: {
+                name: 'players',
+                style: 'height: 100px',
+                required: true,
+                spellcheck: 'false',
+              },
+            }),
+            h('p.form-text', [
+              'Two usernames per line, each line is a game.',
+              h('br'),
+              'First username gets the white pieces, unless randomized by the switch below.',
+            ]),
+            h('div.form-check.form-switch', form.checkboxWithLabel('randomColor', 'Randomize colors')),
+            h(
+              'button.btn.btn-secondary.btn-sm.mt-2',
+              {
+                attrs: {
+                  type: 'button',
+                },
+                on: {
+                  click: () =>
+                    this.validateUsernames(document.getElementById('players') as HTMLTextAreaElement),
+                },
+              },
+              'Validate Lichess usernames',
+            ),
+          ]),
+          h('div.col-md-6', [
+            h('details', [
+              h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
+              h('div.card.card-body.mb-3', [
+                h('div.form-group.mb-3', [
+                  form.label('Pairings URL', 'cr-pairings-url'),
+                  form.input('cr-pairings-url'),
+                ]),
+                h('div.form-group', [
+                  form.label('Players URL', 'cr-players-url'),
+                  form.input('cr-players-url'),
+                  h('p.form-text', [
+                    'Only required if the usernames are not provided on the Pairings page.',
+                    h('br'),
+                    'The Lichess usernames must be in the "Club/City" field.',
+                  ]),
+                ]),
+              ]),
+              h(
+                'button.btn.btn-secondary.btn-sm.mt-3',
+                {
+                  attrs: {
+                    type: 'button',
+                  },
+                  on: {
+                    click: () =>
+                      this.loadPairingsFromChessResults(
+                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                      ),
+                  },
+                },
+                'Load pairings',
+              ),
+            ]),
+          ]),
         ]),
       ]),
-      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('randomColor', 'Randomize colors')),
       form.clock(),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
       form.variant(),
@@ -233,4 +301,48 @@ export class ScheduleGames {
         ]),
       ],
     );
+
+  private validateUsernames = async (textarea: HTMLTextAreaElement) => {
+    const usernames = textarea.value.match(/(<.*?>)|(\S+)/g);
+    if (!usernames) return;
+
+    let validUsernames: string[] = [];
+
+    const chunkSize = 300;
+    for (let i = 0; i < usernames.length; i += chunkSize) {
+      const res = await this.me.httpClient(`${this.lichessUrl}/api/users`, {
+        method: 'POST',
+        body: usernames.slice(i, i + chunkSize).join(', '),
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+      const users = await res.json();
+      validUsernames = validUsernames.concat(users.map((user: any) => user.id));
+    }
+
+    const invalidUsernames = usernames.filter(username => !validUsernames.includes(username.toLowerCase()));
+    if (invalidUsernames.length) {
+      alert(`Invalid usernames: ${invalidUsernames.join(', ')}`);
+    } else {
+      alert('All usernames are valid!');
+    }
+  };
+
+  private loadPairingsFromChessResults = async (
+    pairingsInput: HTMLInputElement,
+    playersInput: HTMLInputElement,
+  ) => {
+    try {
+      const pairingsUrl = pairingsInput.value;
+      const playersUrl = playersInput.value;
+
+      const players = playersUrl ? await getPlayers(playersUrl) : undefined;
+
+      const pairings = await getPairings(pairingsUrl, players);
+      this.insertPairings(pairings);
+    } catch (err) {
+      alert(err);
+    }
+  };
 }
