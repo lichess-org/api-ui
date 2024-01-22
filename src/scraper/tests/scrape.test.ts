@@ -219,11 +219,9 @@ describe('fetch pairings', () => {
     expect(pairings[0]).toEqual({
       white: {
         name: 'Ponkratov, Pavel',
-        rating: 2586,
       },
       black: {
         name: 'Galaktionov, Artem',
-        rating: 2379,
       },
     });
   });
@@ -235,11 +233,35 @@ describe('fetch pairings', () => {
     expect(pairings[0]).toEqual({
       white: {
         name: 'Gunina, Valentina',
-        rating: 2348,
       },
       black: {
         name: 'Mammadzada, Gunay',
-        rating: 2408,
+      },
+    });
+  });
+
+  test('individual swiss w/ player substitution', async () => {
+    const players: Player[] = [
+      {
+        name: 'Gunina, Valentina',
+        lichess: 'test-valentina',
+      },
+      {
+        name: 'Mammadzada, Gunay',
+        lichess: 'test-gunay',
+      },
+    ];
+    const pairings = await getPairings('https://example.com/individual-swiss-pairings.html', players);
+
+    expect(pairings).toHaveLength(59);
+    expect(pairings[0]).toEqual({
+      white: {
+        name: 'Gunina, Valentina',
+        lichess: 'test-valentina',
+      },
+      black: {
+        name: 'Mammadzada, Gunay',
+        lichess: 'test-gunay',
       },
     });
   });

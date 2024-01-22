@@ -162,19 +162,12 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
       return;
     }
 
+    const whiteName = $(element).children().eq(headerRow.indexOf('Name')).text().trim();
+    const blackName = $(element).children().eq(headerRow.lastIndexOf('Name')).text().trim();
+
     pairings.push({
-      white: {
-        name: $(element).children().eq(headerRow.indexOf('Name')).text().trim(),
-        rating: headerRow.includes('Rtg')
-          ? parseInt($(element).children().eq(headerRow.indexOf('Rtg')).text().trim())
-          : undefined,
-      },
-      black: {
-        name: $(element).children().eq(headerRow.lastIndexOf('Name')).text().trim(),
-        rating: headerRow.includes('Rtg')
-          ? parseInt($(element).children().eq(headerRow.lastIndexOf('Rtg')).text().trim())
-          : undefined,
-      },
+      white: players?.find(player => player.name === whiteName) ?? { name: whiteName },
+      black: players?.find(player => player.name === blackName) ?? { name: blackName },
     });
   });
 
