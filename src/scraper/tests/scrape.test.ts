@@ -4,27 +4,36 @@ import { getPlayers, getPairings, setResultsPerPage, getPairingsForTeamSwiss, Pl
 
 global.fetch = vi.fn(url => {
   if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-club-city.html%3Fzeilen%3D99999'
-  ) {
-    return Promise.resolve({
-      text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-with-club-city.html')),
-    });
-  } else if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-with-teams.html%3Fzeilen%3D99999'
-  ) {
-    return Promise.resolve({
-      text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-with-teams.html')),
-    });
-  } else if (url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fpairings-with-teams.html') {
-    return Promise.resolve({
-      text: () => Promise.resolve(readFileSync('src/scraper/tests/fixtures/pairings-with-teams.html')),
-    });
-  } else if (
-    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fteam-swiss-pairings-with-club-city.html'
+    url ==
+    'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-list-with-usernames.html%3Fzeilen%3D99999'
   ) {
     return Promise.resolve({
       text: () =>
-        Promise.resolve(readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-with-club-city.html')),
+        Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-list-with-usernames.html')),
+    });
+  } else if (
+    url ==
+    'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fplayers-list-without-usernames.html%3Fzeilen%3D99999'
+  ) {
+    return Promise.resolve({
+      text: () =>
+        Promise.resolve(readFileSync('src/scraper/tests/fixtures/players-list-without-usernames.html')),
+    });
+  } else if (
+    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fteam-swiss-pairings-without-usernames.html'
+  ) {
+    return Promise.resolve({
+      text: () =>
+        Promise.resolve(
+          readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-without-usernames.html'),
+        ),
+    });
+  } else if (
+    url == 'https://corsproxy.io/?https%3A%2F%2Fexample.com%2Fteam-swiss-pairings-with-usernames.html'
+  ) {
+    return Promise.resolve({
+      text: () =>
+        Promise.resolve(readFileSync('src/scraper/tests/fixtures/team-swiss-pairings-with-usernames.html')),
     });
   }
 
@@ -33,7 +42,7 @@ global.fetch = vi.fn(url => {
 
 describe('fetch players', () => {
   test('with lichess usernames', async () => {
-    const players = await getPlayers('https://example.com/players-with-club-city.html');
+    const players = await getPlayers('https://example.com/players-list-with-usernames.html');
 
     expect(players).toHaveLength(71);
     expect(players[1]).toEqual({
@@ -45,7 +54,7 @@ describe('fetch players', () => {
   });
 
   test('with team columns', async () => {
-    const players = await getPlayers('https://example.com/players-with-teams.html');
+    const players = await getPlayers('https://example.com/players-list-without-usernames.html');
 
     expect(players).toHaveLength(150);
     expect(players[0]).toEqual({
@@ -60,7 +69,7 @@ describe('fetch players', () => {
 describe('fetch pairings', () => {
   test('team swiss', async () => {
     const pairings = await getPairingsForTeamSwiss(
-      'https://example.com/team-swiss-pairings-with-club-city.html',
+      'https://example.com/team-swiss-pairings-with-usernames.html',
     );
 
     expect(pairings).toHaveLength(8);
@@ -187,7 +196,10 @@ describe('fetch pairings', () => {
         lichess: 'test-alexander',
       },
     ];
-    const pairings = await getPairings('https://example.com/pairings-with-teams.html', players);
+    const pairings = await getPairings(
+      'https://example.com/team-swiss-pairings-without-usernames.html',
+      players,
+    );
 
     expect(pairings).toHaveLength(76);
     expect(pairings[0]).toEqual({
