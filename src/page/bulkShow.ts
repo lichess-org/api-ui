@@ -13,7 +13,6 @@ export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
   games: Game[] = [];
-  table?: JQuery<HTMLElement>;
   constructor(
     readonly app: App,
     readonly me: Me,
