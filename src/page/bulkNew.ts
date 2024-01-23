@@ -24,7 +24,7 @@ interface Result {
   startClocksAt: number;
 }
 
-export class ScheduleGames {
+export class BulkNew {
   feedback: Feedback<Result> = undefined;
   lichessUrl: string;
   constructor(

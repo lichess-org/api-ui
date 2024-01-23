@@ -1,7 +1,7 @@
 import { App } from './app';
 import page from 'page';
 import { Home } from './page/home';
-import { ScheduleGames } from './page/scheduleGames';
+import { BulkNew } from './page/bulkNew';
 import { OpenChallenge } from './page/openChallenge';
 import { PuzzleRace } from './page/puzzleRace';
 import { BulkList } from './page/bulkList';
@@ -29,7 +29,7 @@ export default function (app: App) {
   });
   page('/endpoint/open-challenge', _ => new OpenChallenge(app).redraw());
   page('/endpoint/schedule-games', _ => withAuth(me => new BulkList(app, me).redraw()));
-  page('/endpoint/schedule-games/new', _ => withAuth(me => new ScheduleGames(app, me).redraw()));
+  page('/endpoint/schedule-games/new', _ => withAuth(me => new BulkNew(app, me).redraw()));
   page('/endpoint/schedule-games/:id', ctx => withAuth(me => new BulkShow(app, me, ctx.params.id).redraw()));
   page('/endpoint/puzzle-race', _ => withAuth(me => new PuzzleRace(app, me).redraw()));
   page('/too-many-requests', _ => app.tooManyRequests());
