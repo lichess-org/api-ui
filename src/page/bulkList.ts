@@ -4,7 +4,7 @@ import { Me } from '../auth';
 import layout from '../view/layout';
 import { timeFormat } from '../view/util';
 import { Bulk } from '../model';
-import { href } from '../routing';
+import { href, url } from '../routing';
 import { bulkPairing } from '../endpoints';
 
 export class BulkList {
@@ -39,7 +39,7 @@ export class BulkList {
         ]),
         h(
           'a.btn.btn-primary.mt-5',
-          { attrs: { href: '/endpoint/schedule-games/new' } },
+          { attrs: { href: url(`${bulkPairing.path}/new`) } },
           'Schedule new games',
         ),
         this.bulks
