@@ -37,8 +37,13 @@ export class BulkList {
           ),
           ' to create a bunch of games at once.',
         ]),
+        h(
+          'a.btn.btn-primary.mt-5',
+          { attrs: { href: '/endpoint/schedule-games/new' } },
+          'Schedule new games',
+        ),
         this.bulks
-          ? h('table.table.table-striped', [
+          ? h('table.table.table-striped.mt-5', [
               h('thead', [
                 h('tr', [
                   h('th', 'Bulk'),
@@ -66,7 +71,6 @@ export class BulkList {
               ),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
-        h('a.btn.btn-primary', { attrs: { href: '/endpoint/schedule-games/new' } }, 'Schedule new games'),
       ]),
     );
 }

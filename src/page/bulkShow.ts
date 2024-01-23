@@ -77,6 +77,15 @@ export class BulkShow {
       return a.id < b.id ? -1 : 1;
     });
   };
+  private startClocks = async () => {
+    const res = await this.me.httpClient(
+      `${this.app.config.lichessHost}/api/bulk-pairing/${this.id}/start-clocks`,
+      { method: 'POST' },
+    );
+    if (res.status === 200) {
+      alert('Clocks started');
+    }
+  };
   redraw = () => this.app.redraw(this.render());
   render = () => {
     const playerLink = (player: Player) =>
@@ -108,15 +117,23 @@ export class BulkShow {
                 h('br'),
                 'Games completed: ' + this.games.filter(g => g.result !== '*').length,
                 ' / ' + this.games.length,
+                h('br'),
+                h(
+                  'a.btn.btn-sm.btn-outline-warning',
+                  {
+                    on: {
+                      click: () => {
+                        if (confirm('Start all clocks?')) this.startClocks();
+                      },
+                    },
+                  },
+                  'Start all clocks',
+                ),
               ]),
               h(
                 'table.table.table-striped',
                 {
-                  hook: {
-                    destroy: () => {
-                      this.stream?.close();
-                    },
-                  },
+                  hook: { destroy: () => this.stream?.close() },
                 },
                 [
                   h('thead', [
