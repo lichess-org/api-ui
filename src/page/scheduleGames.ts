@@ -7,6 +7,8 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
+import { href } from '../routing';
+import { bulkPairing } from '../endpoints';
 
 interface Tokens {
   [username: string]: string;
@@ -36,6 +38,10 @@ export class ScheduleGames {
     layout(
       this.app,
       h('div', [
+        h('nav.mt-5.breadcrumb', [
+          h('span.breadcrumb-item', h('a', { attrs: href(bulkPairing.path) }, 'Schedule games')),
+          h('span.breadcrumb-item.active', 'New bulk pairing'),
+        ]),
         h('h1.mt-5', 'Schedule games'),
         h('p.lead', [
           'Uses the ',

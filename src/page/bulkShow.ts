@@ -2,17 +2,25 @@ import { h } from 'snabbdom';
 import { App } from '../app';
 import { Me } from '../auth';
 import layout from '../view/layout';
-import { card, timeFormat } from '../view/util';
+import { timeFormat } from '../view/util';
 import { Bulk, BulkId, Game, Player } from '../model';
-import { readStream } from '../ndJsonStream';
+import { Stream, readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 import { sleep } from '../util';
 
+interface BulkGame {
+  id: string;
+  moves: number;
+  result: string;
+  players: { white: Player; black: Player };
+}
+
 export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
-  games: Game[] = [];
+  games: BulkGame[] = [];
+  stream?: Stream;
   constructor(
     readonly app: App,
     readonly me: Me,
@@ -33,17 +41,29 @@ export class BulkShow {
         body: this.bulk.games.map(game => game.id).join(','),
         headers: { Accept: 'application/x-ndjson' },
       });
-      const handler = (game: Game) => {
-        game.nbMoves = game.moves ? game.moves.split(' ').length : 0;
+      const handler = (g: Game) => {
+        const game = {
+          id: g.id,
+          players: g.players,
+          moves: g.moves ? g.moves.split(' ').length : 0,
+          result:
+            g.status == 'created' || g.status == 'started'
+              ? '*'
+              : g.winner == 'white'
+                ? '1-0'
+                : g.winner == 'black'
+                  ? '0-1'
+                  : '½-½',
+        };
         const exists = this.games.findIndex(g => g.id === game.id);
         if (exists >= 0) this.games[exists] = game;
         else this.games.push(game);
         this.sortGames();
         this.redraw();
       };
-      const stream = readStream(res, handler);
-      await stream.closePromise;
-      if (this.games.find(g => g.status === 'started' || g.status === 'created')) {
+      this.stream = readStream(res, handler);
+      this.stream.closePromise;
+      if (this.games.find(g => g.result === '*')) {
         await sleep(1 * 1000);
         return this.loadGames();
       }
@@ -51,12 +71,9 @@ export class BulkShow {
   };
   private sortGames = () => {
     this.games.sort((a, b) => {
-      if (a.status === 'created' && b.status !== 'created') return -1;
-      if (a.status !== 'created' && b.status === 'created') return 1;
-      if (a.status === 'started' && b.status !== 'started') return -1;
-      if (a.status !== 'started' && b.status === 'started') return 1;
-      if (a.status !== b.status) return a.status < b.status ? -1 : 1;
-      if (a.nbMoves !== b.nbMoves) return a.nbMoves < b.nbMoves ? -1 : 1;
+      if (a.result === '*' && b.result !== '*') return -1;
+      if (a.result !== '*' && b.result === '*') return 1;
+      if (a.moves !== b.moves) return a.moves < b.moves ? -1 : 1;
       return a.id < b.id ? -1 : 1;
     });
   };
@@ -70,57 +87,61 @@ export class BulkShow {
     return layout(
       this.app,
       h('div', [
-        h('h1.mt-5.breadcrumb', [
+        h('nav.mt-5.breadcrumb', [
           h('span.breadcrumb-item', h('a', { attrs: href(bulkPairing.path) }, 'Schedule games')),
           h('span.breadcrumb-item.active', `#${this.id}`),
         ]),
+        h('h1.mt-5', `Bulk pairing #${this.id}`),
         this.bulk
           ? h('div', [
-              card(
-                this.bulk.id,
-                [`Bulk pairing #${this.id}`],
+              h('p.lead', [
+                'Created at: ',
+                timeFormat(new Date(this.bulk.scheduledAt)),
+                h('br'),
+                'Games scheduled at: ',
+                this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
+                h('br'),
+                'Clocks start at: ',
+                this.bulk.startClocksAt
+                  ? timeFormat(new Date(this.bulk.startClocksAt))
+                  : 'Player first moves',
+                h('br'),
+                'Games completed: ' + this.games.filter(g => g.result !== '*').length,
+                ' / ' + this.games.length,
+              ]),
+              h(
+                'table.table.table-striped',
+                {
+                  hook: {
+                    destroy: () => {
+                      this.stream?.close();
+                    },
+                  },
+                },
                 [
-                  h('p.lead', [
-                    'Created at: ',
-                    timeFormat(new Date(this.bulk.scheduledAt)),
-                    h('br'),
-                    'Games scheduled at: ',
-                    this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
-                    h('br'),
-                    'Clocks start at: ',
-                    this.bulk.startClocksAt
-                      ? timeFormat(new Date(this.bulk.startClocksAt))
-                      : 'Player first moves',
-                    h('br'),
-                    'Games completed: ' +
-                      this.games.filter(g => g.status != 'created' && g.status != 'started').length,
-                    ' / ' + this.games.length,
+                  h('thead', [
+                    h('tr', [
+                      h('th', this.games.length + ' games'),
+                      h('th', 'White'),
+                      h('th', 'Black'),
+                      h('th', 'Result'),
+                      h('th', 'Moves'),
+                    ]),
                   ]),
+                  h(
+                    'tbody',
+                    this.games.map(g =>
+                      h('tr', { key: g.id }, [
+                        h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
+                        h('td', playerLink(g.players.white)),
+                        h('td', playerLink(g.players.black)),
+                        h('td', g.result),
+                        h('td', g.moves),
+                      ]),
+                    ),
+                  ),
                 ],
               ),
-              h('table.table.table-striped', [
-                h('thead', [
-                  h('tr', [
-                    h('th', this.games.length + ' games'),
-                    h('th', 'White'),
-                    h('th', 'Black'),
-                    h('th', 'Status'),
-                    h('th', 'Moves'),
-                  ]),
-                ]),
-                h(
-                  'tbody',
-                  this.games.map(g =>
-                    h('tr', { key: g.id }, [
-                      h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
-                      h('td', playerLink(g.players.white)),
-                      h('td', playerLink(g.players.black)),
-                      h('td.' + g.status, g.status),
-                      h('td', g.nbMoves),
-                    ]),
-                  ),
-                ),
-              ]),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
       ]),
