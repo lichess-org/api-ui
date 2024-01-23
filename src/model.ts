@@ -19,6 +19,7 @@ export type Username = string;
 export interface Game {
   id: string;
   moves: string;
+  nbMoves: number;
   status: string;
   players: { white: Player; black: Player };
 }

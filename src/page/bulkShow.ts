@@ -3,7 +3,7 @@ import { App } from '../app';
 import { Me } from '../auth';
 import layout from '../view/layout';
 import { card, timeFormat } from '../view/util';
-import { Bulk, BulkId, Game } from '../model';
+import { Bulk, BulkId, Game, Player } from '../model';
 import { readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
@@ -34,9 +34,11 @@ export class BulkShow {
         headers: { Accept: 'application/x-ndjson' },
       });
       const handler = (game: Game) => {
+        game.nbMoves = game.moves ? game.moves.split(' ').length : 0;
         const exists = this.games.findIndex(g => g.id === game.id);
         if (exists >= 0) this.games[exists] = game;
         else this.games.push(game);
+        this.sortGames();
         this.redraw();
       };
       const stream = readStream(res, handler);
@@ -47,9 +49,25 @@ export class BulkShow {
       }
     }
   };
+  private sortGames = () => {
+    this.games.sort((a, b) => {
+      if (a.status === 'created' && b.status !== 'created') return -1;
+      if (a.status !== 'created' && b.status === 'created') return 1;
+      if (a.status === 'started' && b.status !== 'started') return -1;
+      if (a.status !== 'started' && b.status === 'started') return 1;
+      if (a.status !== b.status) return a.status < b.status ? -1 : 1;
+      if (a.nbMoves !== b.nbMoves) return a.nbMoves < b.nbMoves ? -1 : 1;
+      return a.id < b.id ? -1 : 1;
+    });
+  };
   redraw = () => this.app.redraw(this.render());
-  render = () =>
-    layout(
+  render = () => {
+    const playerLink = (player: Player) =>
+      this.lichessLink(
+        '@/' + player.user.name,
+        `${player.user.title ? player.user.title + ' ' : ''}${player.user.name}`,
+      );
+    return layout(
       this.app,
       h('div', [
         h('h1.mt-5.breadcrumb', [
@@ -58,39 +76,47 @@ export class BulkShow {
         ]),
         this.bulk
           ? h('div', [
-              card(this.bulk.id, [`Bulk pairing #${this.id}`], ['WIP']),
-              h('p.lead', [
-                'Game scheduled at: ',
-                this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
-                h('br'),
-                'Clocks start at: ',
-                this.bulk.startClocksAt
-                  ? timeFormat(new Date(this.bulk.startClocksAt))
-                  : 'Player first moves',
-              ]),
+              card(
+                this.bulk.id,
+                [`Bulk pairing #${this.id}`],
+                [
+                  h('p.lead', [
+                    'Created at: ',
+                    timeFormat(new Date(this.bulk.scheduledAt)),
+                    h('br'),
+                    'Games scheduled at: ',
+                    this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
+                    h('br'),
+                    'Clocks start at: ',
+                    this.bulk.startClocksAt
+                      ? timeFormat(new Date(this.bulk.startClocksAt))
+                      : 'Player first moves',
+                    h('br'),
+                    'Games completed: ' +
+                      this.games.filter(g => g.status != 'created' && g.status != 'started').length,
+                    ' / ' + this.games.length,
+                  ]),
+                ],
+              ),
               h('table.table.table-striped', [
                 h('thead', [
                   h('tr', [
-                    h(
-                      'th',
-                      { attrs: { 'data-field': 'id', 'data-sortable': 'true' } },
-                      this.games.length + ' games',
-                    ),
-                    h('th', { attrs: { 'data-field': 'white', 'data-sortable': 'true' } }, 'White'),
-                    h('th', { attrs: { 'data-field': 'black', 'data-sortable': 'true' } }, 'Black'),
-                    h('th', { attrs: { 'data-field': 'status', 'data-sortable': 'true' } }, 'Status'),
-                    h('th', { attrs: { 'data-field': 'moves', 'data-sortable': 'true' } }, 'Moves'),
+                    h('th', this.games.length + ' games'),
+                    h('th', 'White'),
+                    h('th', 'Black'),
+                    h('th', 'Status'),
+                    h('th', 'Moves'),
                   ]),
                 ]),
                 h(
                   'tbody',
                   this.games.map(g =>
-                    h('tr', [
+                    h('tr', { key: g.id }, [
                       h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
-                      h('td', this.lichessLink('@/' + g.players.white.user.name, g.players.white.user.name)),
-                      h('td', this.lichessLink('@/' + g.players.black.user.name, g.players.black.user.name)),
-                      h('td', g.status),
-                      h('td', g.moves ? g.moves.split(' ').length : 0),
+                      h('td', playerLink(g.players.white)),
+                      h('td', playerLink(g.players.black)),
+                      h('td.' + g.status, g.status),
+                      h('td', g.nbMoves),
                     ]),
                   ),
                 ),
@@ -99,6 +125,7 @@ export class BulkShow {
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
       ]),
     );
+  };
   private lichessLink = (path: string, text: string) =>
     h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
 }
