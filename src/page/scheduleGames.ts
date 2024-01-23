@@ -1,11 +1,11 @@
 import { h } from 'snabbdom';
+import page from 'page';
 import { App } from '../app';
 import { Me } from '../auth';
 import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
-import { card, timeFormat } from '../view/util';
 import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
 
 interface Tokens {
@@ -51,7 +51,7 @@ export class ScheduleGames {
           h('strong', 'API Challenge admin'),
           ' permission to generate the player challenge tokens automatically.',
         ]),
-        this.renderForm(isSuccess(this.feedback) ? this.feedback.result.id : undefined),
+        this.renderForm(),
       ]),
     );
 
@@ -104,9 +104,11 @@ export class ScheduleGames {
         }),
       });
       this.feedback = await responseToFeedback(req);
+      if (isSuccess(this.feedback)) page(`/endpoint/schedule-games/${this.feedback.result.id}`);
     } catch (err) {
+      console.warn(err);
       this.feedback = {
-        error: { players: err as string },
+        error: { players: JSON.stringify(err) },
       };
     }
     this.redraw();
@@ -139,15 +141,14 @@ export class ScheduleGames {
     });
   }
 
-  private renderForm = (lastId?: string) =>
+  private renderForm = () =>
     form.form(this.onSubmit, [
       form.feedback(this.feedback),
-      isSuccess(this.feedback) ? this.renderResult(this.feedback.result) : undefined,
       h('div.mb-3', [
         h('div.row', [
           h('div.col-md-6', [
             form.label('Players', 'players'),
-            h(`textarea#players.form-control.${lastId || 'bulk-new'}`, {
+            h('textarea#players.form-control', {
               attrs: {
                 name: 'players',
                 style: 'height: 100px',
@@ -271,36 +272,6 @@ export class ScheduleGames {
       ]),
       form.submit('Schedule the games'),
     ]);
-
-  private renderResult = (result: Result) =>
-    card(
-      result.id,
-      ['Bulk #', result.id],
-      [
-        h('p.lead', [
-          'Game scheduled at: ',
-          result.pairAt ? timeFormat(new Date(result.pairAt)) : 'Now',
-          h('br'),
-          'Clocks start at: ',
-          result.startClocksAt ? timeFormat(new Date(result.startClocksAt)) : 'Player first moves',
-        ]),
-        h('table.table.table-striped', [
-          h('thead', h('tr', [h('th', 'Game'), h('th', 'White'), h('th', 'Black')])),
-          h(
-            'tbody',
-            result.games.map(game => {
-              const lichessLink = (path: string, text: string) =>
-                h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
-              return h('tr', [
-                h('td', lichessLink(game.id, '#' + game.id)),
-                h('td', lichessLink(`@/${game.white}`, game.white)),
-                h('td', lichessLink(`@/${game.black}`, game.black)),
-              ]);
-            }),
-          ),
-        ]),
-      ],
-    );
 
   private validateUsernames = async (textarea: HTMLTextAreaElement) => {
     const usernames = textarea.value.match(/(<.*?>)|(\S+)/g);

@@ -1,5 +1,6 @@
 @import './bootstrap';
 @import './navbar';
+@import '../node_modules/bootstrap-table/src/bootstrap-table';
 
 body > .container {
   min-height: 60vh;

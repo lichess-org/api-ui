@@ -4,6 +4,7 @@ import '../scss/_bootstrap.scss';
 import '../scss/style.scss';
 import '../node_modules/bootstrap/js/dist/dropdown.js';
 import '../node_modules/bootstrap/js/dist/collapse.js';
+import '../node_modules/bootstrap-table/dist/bootstrap-table.js';
 import routing from './routing';
 import { App, Config } from './app';
 

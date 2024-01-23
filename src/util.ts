@@ -21,3 +21,5 @@ export const gameRuleKeys = gameRules.map(([key]) => key);
 
 export const gameRulesExceptNoAbort = gameRules.filter(([key]) => key !== 'noAbort');
 export const gameRuleKeysExceptNoAbort = gameRulesExceptNoAbort.map(([key]) => key);
+
+export const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));

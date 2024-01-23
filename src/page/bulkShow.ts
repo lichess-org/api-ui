@@ -2,16 +2,19 @@ import { h } from 'snabbdom';
 import { App } from '../app';
 import { Me } from '../auth';
 import layout from '../view/layout';
-import { card } from '../view/util';
+import { card, timeFormat } from '../view/util';
 import { Bulk, BulkId, Game } from '../model';
 import { readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
+import { sleep } from '../util';
+import $ from 'jquery';
 
 export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
   games: Game[] = [];
+  table?: JQuery<HTMLElement>;
   constructor(
     readonly app: App,
     readonly me: Me,
@@ -25,24 +28,44 @@ export class BulkShow {
     this.bulk = await res.json();
     this.redraw();
   };
-  loadGames = async () => {
+  loadGames = async (): Promise<void> => {
     if (this.bulk) {
       const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/games/export/_ids`, {
         method: 'POST',
         body: this.bulk.games.map(game => game.id).join(','),
         headers: { Accept: 'application/x-ndjson' },
       });
-      const handler = (game: Game) => {
-        const i = this.games.findIndex(g => g.id === game.id);
-        if (i >= 0) this.games[i] = game;
+      const handler = (game: Game, i: number) => {
+        const exists = this.games.findIndex(g => g.id === game.id);
+        if (exists >= 0) this.games[exists] = game;
         else this.games.push(game);
-        this.redraw();
+        if (i % 50 === 0) this.updateTable();
       };
-      const stream = readStream(res, handler);
-      return await stream.closePromise;
+      let i = 0;
+      const stream = readStream(res, obj => handler(obj, i++));
+      await stream.closePromise;
+      this.updateTable();
+      if (this.games.find(g => g.status === 'started' || g.status === 'created')) {
+        await sleep(1 * 1000);
+        // return this.loadGames();
+      }
     }
   };
   redraw = () => this.app.redraw(this.render());
+
+  private updateTable = () => {
+    if (this.table)
+      this.table.bootstrapTable(
+        'load',
+        this.games.map(g => ({
+          id: g.id,
+          white: g.players.white.user.name,
+          black: g.players.black.user.name,
+          status: g.status,
+          moves: g.moves ? g.moves.split(' ').length : 0,
+        })),
+      );
+  };
   render = () =>
     layout(
       this.app,
@@ -54,23 +77,65 @@ export class BulkShow {
         this.bulk
           ? h('div', [
               card(this.bulk.id, [`Bulk pairing #${this.id}`], ['WIP']),
-              h('table.table.table-striped', [
-                h('thead', [h('tr', [h('th', 'Games'), h('th', 'Moves')])]),
-                h(
-                  'tbody',
-                  this.games.map(g =>
+              h('p.lead', [
+                'Game scheduled at: ',
+                this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
+                h('br'),
+                'Clocks start at: ',
+                this.bulk.startClocksAt
+                  ? timeFormat(new Date(this.bulk.startClocksAt))
+                  : 'Player first moves',
+              ]),
+              h(
+                'table.table.table-striped',
+                {
+                  hook: {
+                    insert: vnode => {
+                      this.table = $(vnode.elm as HTMLTableElement);
+                      this.table.bootstrapTable({
+                        sortStable: true,
+                      });
+                    },
+                  },
+                },
+                [
+                  h('thead', [
                     h('tr', [
                       h(
-                        'td',
-                        h('a.lichess-id', { attrs: { href: `${this.lichessUrl}/${g.id}` } }, `#${g.id}`),
+                        'th',
+                        { attrs: { 'data-field': 'id', 'data-sortable': 'true' } },
+                        this.games.length + ' games',
                       ),
-                      h('td', g.moves),
+                      h('th', { attrs: { 'data-field': 'white', 'data-sortable': 'true' } }, 'White'),
+                      h('th', { attrs: { 'data-field': 'black', 'data-sortable': 'true' } }, 'Black'),
+                      h('th', { attrs: { 'data-field': 'status', 'data-sortable': 'true' } }, 'Status'),
+                      h('th', { attrs: { 'data-field': 'moves', 'data-sortable': 'true' } }, 'Moves'),
                     ]),
+                  ]),
+                  h(
+                    'tbody',
+                    this.games.map(g =>
+                      h('tr', [
+                        h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
+                        h(
+                          'td',
+                          this.lichessLink('@/' + g.players.white.user.name, g.players.white.user.name),
+                        ),
+                        h(
+                          'td',
+                          this.lichessLink('@/' + g.players.black.user.name, g.players.black.user.name),
+                        ),
+                        h('td', g.status),
+                        h('td', g.moves ? g.moves.split(' ').length : 0),
+                      ]),
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
       ]),
     );
+  private lichessLink = (path: string, text: string) =>
+    h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
 }
