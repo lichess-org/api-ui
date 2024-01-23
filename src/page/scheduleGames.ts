@@ -318,7 +318,7 @@ export class ScheduleGames {
         },
       });
       const users = await res.json();
-      validUsernames = validUsernames.concat(users.map((user: any) => user.id));
+      validUsernames = validUsernames.concat(users.filter((u: any) => !u.disabled).map((u: any) => u.id));
     }
 
     const invalidUsernames = usernames.filter(username => !validUsernames.includes(username.toLowerCase()));
