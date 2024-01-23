@@ -5,9 +5,7 @@
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "~2.13.0",
     "bootstrap": "~5.3.2",
-    "bootstrap-table": "^1.22.2",
     "cheerio": "1.0.0-rc.12",
-    "jquery": "^3.7.1",
     "page": "~1.11.6",
     "snabbdom": "~3.6.0"
   },
@@ -17,7 +15,6 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/cheerio": "^0.22.35",
-    "@types/jquery": "^3.5.29",
     "@types/node": "^20.11.5",
     "@types/page": "^1.11.9",
     "http-server": "^14.1.1",

@@ -8,7 +8,6 @@ import { readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 import { sleep } from '../util';
-import $ from 'jquery';
 
 export class BulkShow {
   lichessUrl: string;
@@ -35,37 +34,21 @@ export class BulkShow {
         body: this.bulk.games.map(game => game.id).join(','),
         headers: { Accept: 'application/x-ndjson' },
       });
-      const handler = (game: Game, i: number) => {
+      const handler = (game: Game) => {
         const exists = this.games.findIndex(g => g.id === game.id);
         if (exists >= 0) this.games[exists] = game;
         else this.games.push(game);
-        if (i % 50 === 0) this.updateTable();
+        this.redraw();
       };
-      let i = 0;
-      const stream = readStream(res, obj => handler(obj, i++));
+      const stream = readStream(res, handler);
       await stream.closePromise;
-      this.updateTable();
       if (this.games.find(g => g.status === 'started' || g.status === 'created')) {
         await sleep(1 * 1000);
-        // return this.loadGames();
+        return this.loadGames();
       }
     }
   };
   redraw = () => this.app.redraw(this.render());
-
-  private updateTable = () => {
-    if (this.table)
-      this.table.bootstrapTable(
-        'load',
-        this.games.map(g => ({
-          id: g.id,
-          white: g.players.white.user.name,
-          black: g.players.black.user.name,
-          status: g.status,
-          moves: g.moves ? g.moves.split(' ').length : 0,
-        })),
-      );
-  };
   render = () =>
     layout(
       this.app,
@@ -86,52 +69,33 @@ export class BulkShow {
                   ? timeFormat(new Date(this.bulk.startClocksAt))
                   : 'Player first moves',
               ]),
-              h(
-                'table.table.table-striped',
-                {
-                  hook: {
-                    insert: vnode => {
-                      this.table = $(vnode.elm as HTMLTableElement);
-                      this.table.bootstrapTable({
-                        sortStable: true,
-                      });
-                    },
-                  },
-                },
-                [
-                  h('thead', [
-                    h('tr', [
-                      h(
-                        'th',
-                        { attrs: { 'data-field': 'id', 'data-sortable': 'true' } },
-                        this.games.length + ' games',
-                      ),
-                      h('th', { attrs: { 'data-field': 'white', 'data-sortable': 'true' } }, 'White'),
-                      h('th', { attrs: { 'data-field': 'black', 'data-sortable': 'true' } }, 'Black'),
-                      h('th', { attrs: { 'data-field': 'status', 'data-sortable': 'true' } }, 'Status'),
-                      h('th', { attrs: { 'data-field': 'moves', 'data-sortable': 'true' } }, 'Moves'),
-                    ]),
-                  ]),
-                  h(
-                    'tbody',
-                    this.games.map(g =>
-                      h('tr', [
-                        h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
-                        h(
-                          'td',
-                          this.lichessLink('@/' + g.players.white.user.name, g.players.white.user.name),
-                        ),
-                        h(
-                          'td',
-                          this.lichessLink('@/' + g.players.black.user.name, g.players.black.user.name),
-                        ),
-                        h('td', g.status),
-                        h('td', g.moves ? g.moves.split(' ').length : 0),
-                      ]),
+              h('table.table.table-striped', [
+                h('thead', [
+                  h('tr', [
+                    h(
+                      'th',
+                      { attrs: { 'data-field': 'id', 'data-sortable': 'true' } },
+                      this.games.length + ' games',
                     ),
+                    h('th', { attrs: { 'data-field': 'white', 'data-sortable': 'true' } }, 'White'),
+                    h('th', { attrs: { 'data-field': 'black', 'data-sortable': 'true' } }, 'Black'),
+                    h('th', { attrs: { 'data-field': 'status', 'data-sortable': 'true' } }, 'Status'),
+                    h('th', { attrs: { 'data-field': 'moves', 'data-sortable': 'true' } }, 'Moves'),
+                  ]),
+                ]),
+                h(
+                  'tbody',
+                  this.games.map(g =>
+                    h('tr', [
+                      h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
+                      h('td', this.lichessLink('@/' + g.players.white.user.name, g.players.white.user.name)),
+                      h('td', this.lichessLink('@/' + g.players.black.user.name, g.players.black.user.name)),
+                      h('td', g.status),
+                      h('td', g.moves ? g.moves.split(' ').length : 0),
+                    ]),
                   ),
-                ],
-              ),
+                ),
+              ]),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
       ]),
