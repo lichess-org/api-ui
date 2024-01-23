@@ -15,3 +15,8 @@ export interface BulkGame {
 }
 export type BulkId = string;
 export type Username = string;
+
+export interface Game {
+  id: string;
+  moves: string;
+}

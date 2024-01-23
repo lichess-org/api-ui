@@ -52,7 +52,7 @@ export class BulkList {
               ]),
               h(
                 'tbody',
-                this.bulks!.map(bulk =>
+                this.bulks.map(bulk =>
                   h('tr', [
                     h('td', h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, `#${bulk.id}`)),
                     h('td', bulk.games.length),
