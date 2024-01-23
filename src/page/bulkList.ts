@@ -59,7 +59,7 @@ export class BulkList {
                 'tbody',
                 this.bulks.map(bulk =>
                   h('tr', [
-                    h('td', h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, `#${bulk.id}`)),
+                    h('td.mono', h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, `#${bulk.id}`)),
                     h('td', bulk.games.length),
                     h('td', bulk.variant),
                     h('td', bulk.rated ? 'Rated' : 'Casual'),

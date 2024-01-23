@@ -3,10 +3,12 @@ export interface Bulk {
   games: BulkGame[];
   variant: string;
   rated: boolean;
+  rules: string[];
   pairAt: Date;
-  startClocksAt?: Date;
-  scheduledAt: Date;
-  pairedAt?: Date;
+  startClocksAt?: number;
+  scheduledAt: number;
+  pairedAt?: number;
+  clock: { limit: number; increment: number };
 }
 export interface BulkGame {
   id: string;

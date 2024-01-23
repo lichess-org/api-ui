@@ -20,7 +20,8 @@ export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
   games: BulkGame[] = [];
-  stream?: Stream;
+  gameStream?: Stream;
+  liveUpdate = true;
   constructor(
     readonly app: App,
     readonly me: Me,
@@ -35,6 +36,7 @@ export class BulkShow {
     this.redraw();
   };
   loadGames = async (): Promise<void> => {
+    this.gameStream?.close();
     if (this.bulk) {
       const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/games/export/_ids`, {
         method: 'POST',
@@ -61,12 +63,11 @@ export class BulkShow {
         this.sortGames();
         this.redraw();
       };
-      this.stream = readStream(res, handler);
-      this.stream.closePromise;
-      if (this.games.find(g => g.result === '*')) {
-        await sleep(1 * 1000);
-        return this.loadGames();
-      }
+      this.gameStream = readStream(res, handler);
+      await this.gameStream.closePromise;
+      await sleep(5 * 1000);
+      this.liveUpdate = this.liveUpdate && !!this.games.find(g => g.result === '*');
+      if (this.liveUpdate) return await this.loadGames();
     }
   };
   private sortGames = () => {
@@ -77,14 +78,20 @@ export class BulkShow {
       return a.id < b.id ? -1 : 1;
     });
   };
+  private canStartClocks = () =>
+    (!this.bulk?.startClocksAt || this.bulk.startClocksAt > Date.now()) && this.games.find(g => g.moves < 2);
   private startClocks = async () => {
-    const res = await this.me.httpClient(
-      `${this.app.config.lichessHost}/api/bulk-pairing/${this.id}/start-clocks`,
-      { method: 'POST' },
-    );
-    if (res.status === 200) {
-      alert('Clocks started');
+    if (this.bulk && this.canStartClocks()) {
+      const res = await this.me.httpClient(
+        `${this.app.config.lichessHost}/api/bulk-pairing/${this.id}/start-clocks`,
+        { method: 'POST' },
+      );
+      if (res.status === 200) this.bulk.startClocksAt = Date.now();
     }
+  };
+  private onDestroy = () => {
+    this.gameStream?.close();
+    this.liveUpdate = false;
   };
   redraw = () => this.app.redraw(this.render());
   render = () => {
@@ -100,67 +107,102 @@ export class BulkShow {
           h('span.breadcrumb-item', h('a', { attrs: href(bulkPairing.path) }, 'Schedule games')),
           h('span.breadcrumb-item.active', `#${this.id}`),
         ]),
-        h('h1.mt-5', `Bulk pairing #${this.id}`),
         this.bulk
-          ? h('div', [
-              h('p.lead', [
-                'Created at: ',
-                timeFormat(new Date(this.bulk.scheduledAt)),
-                h('br'),
-                'Games scheduled at: ',
-                this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now',
-                h('br'),
-                'Clocks start at: ',
-                this.bulk.startClocksAt
-                  ? timeFormat(new Date(this.bulk.startClocksAt))
-                  : 'Player first moves',
-                h('br'),
-                'Games completed: ' + this.games.filter(g => g.result !== '*').length,
-                ' / ' + this.games.length,
-                h('br'),
+          ? h(`div.card.my-5`, [
+              h('h1.card-header.text-body-emphasis.py-4', `Bulk pairing #${this.id}`),
+              h('div.card-body', [
                 h(
-                  'a.btn.btn-sm.btn-outline-warning',
-                  {
-                    on: {
-                      click: () => {
-                        if (confirm('Start all clocks?')) this.startClocks();
-                      },
-                    },
-                  },
-                  'Start all clocks',
-                ),
-              ]),
-              h(
-                'table.table.table-striped',
-                {
-                  hook: { destroy: () => this.stream?.close() },
-                },
-                [
-                  h('thead', [
+                  'table.table.table-borderless',
+                  h('tbody', [
+                    h('tr', [h('th', 'Created at'), h('td', timeFormat(new Date(this.bulk.scheduledAt)))]),
                     h('tr', [
-                      h('th', this.games.length + ' games'),
-                      h('th', 'White'),
-                      h('th', 'Black'),
-                      h('th', 'Result'),
-                      h('th', 'Moves'),
+                      h('th', 'Games scheduled at'),
+                      h('td', this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now'),
+                    ]),
+                    h('tr', [
+                      h('th', 'Clocks start at'),
+                      h(
+                        'td',
+                        this.bulk.startClocksAt
+                          ? timeFormat(new Date(this.bulk.startClocksAt))
+                          : 'When players make a move',
+                      ),
+                    ]),
+                    h('tr', [
+                      h('th', 'Games started'),
+                      h('td.mono', [
+                        this.games.filter(g => g.moves > 1).length,
+                        ' / ' + this.bulk.games.length,
+                      ]),
+                    ]),
+                    h('tr', [
+                      h('th', 'Games completed'),
+                      h('td.mono', [
+                        this.games.filter(g => g.result !== '*').length,
+                        ' / ' + this.bulk.games.length,
+                      ]),
+                    ]),
+                    h('tr', [
+                      h('th', 'Extra rules'),
+                      h(
+                        'td',
+                        this.bulk.rules.map(r => h('span.badge.rounded-pill.text-bg-secondary.mx-1', r)),
+                      ),
+                    ]),
+                    h('tr', [
+                      h('th'),
+                      h(
+                        'td',
+                        this.canStartClocks()
+                          ? h(
+                              'a.btn.btn-sm.btn-outline-warning',
+                              {
+                                on: {
+                                  click: () => {
+                                    if (confirm('Start all clocks?')) this.startClocks();
+                                  },
+                                },
+                              },
+                              'Start all clocks now',
+                            )
+                          : undefined,
+                      ),
                     ]),
                   ]),
-                  h(
-                    'tbody',
-                    this.games.map(g =>
-                      h('tr', { key: g.id }, [
-                        h('td.lichess-id', this.lichessLink(g.id, `#${g.id}`)),
-                        h('td', playerLink(g.players.white)),
-                        h('td', playerLink(g.players.black)),
-                        h('td', g.result),
-                        h('td', g.moves),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ]),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
+        ,
+        h(
+          'table.table.table-striped.table-hover',
+          {
+            hook: { destroy: () => this.onDestroy() },
+          },
+          [
+            h('thead', [
+              h('tr', [
+                h('th', this.bulk?.games.length + ' games'),
+                h('th', 'White'),
+                h('th', 'Black'),
+                h('th.text-center', 'Result'),
+                h('th.text-end', 'Moves'),
+              ]),
+            ]),
+            h(
+              'tbody',
+              this.games.map(g =>
+                h('tr', { key: g.id }, [
+                  h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
+                  h('td', playerLink(g.players.white)),
+                  h('td', playerLink(g.players.black)),
+                  h('td.mono.text-center', g.result),
+                  h('td.mono.text-end', g.moves),
+                ]),
+              ),
+            ),
+          ],
+        ),
       ]),
     );
   };
