@@ -65,19 +65,19 @@ export class BulkShow {
       };
       this.gameStream = readStream(res, handler);
       await this.gameStream.closePromise;
-      await sleep(5 * 1000);
-      this.liveUpdate = this.liveUpdate && !!this.games.find(g => g.result === '*');
+      const empty = this.games.length == 0;
+      await sleep((empty ? 1 : 5) * 1000);
+      this.liveUpdate = this.liveUpdate && (empty || !!this.games.find(g => g.result === '*'));
       if (this.liveUpdate) return await this.loadGames();
     }
   };
-  private sortGames = () => {
+  private sortGames = () =>
     this.games.sort((a, b) => {
       if (a.result === '*' && b.result !== '*') return -1;
       if (a.result !== '*' && b.result === '*') return 1;
       if (a.moves !== b.moves) return a.moves < b.moves ? -1 : 1;
       return a.id < b.id ? -1 : 1;
     });
-  };
   private canStartClocks = () =>
     (!this.bulk?.startClocksAt || this.bulk.startClocksAt > Date.now()) && this.games.find(g => g.moves < 2);
   private startClocks = async () => {
@@ -121,12 +121,24 @@ export class BulkShow {
                     ]),
                     h('tr', [
                       h('th', 'Clocks start at'),
-                      h(
-                        'td',
+                      h('td', [
                         this.bulk.startClocksAt
                           ? timeFormat(new Date(this.bulk.startClocksAt))
                           : 'When players make a move',
-                      ),
+                        this.canStartClocks()
+                          ? h(
+                              'a.btn.btn-sm.btn-outline-warning.ms-3',
+                              {
+                                on: {
+                                  click: () => {
+                                    if (confirm('Start all clocks?')) this.startClocks();
+                                  },
+                                },
+                              },
+                              'Start all clocks now',
+                            )
+                          : undefined,
+                      ]),
                     ]),
                     h('tr', [
                       h('th', 'Games started'),
@@ -142,67 +154,52 @@ export class BulkShow {
                         ' / ' + this.bulk.games.length,
                       ]),
                     ]),
-                    h('tr', [
-                      h('th', 'Extra rules'),
-                      h(
-                        'td',
-                        this.bulk.rules.map(r => h('span.badge.rounded-pill.text-bg-secondary.mx-1', r)),
-                      ),
-                    ]),
-                    h('tr', [
-                      h('th'),
-                      h(
-                        'td',
-                        this.canStartClocks()
-                          ? h(
-                              'a.btn.btn-sm.btn-outline-warning',
-                              {
-                                on: {
-                                  click: () => {
-                                    if (confirm('Start all clocks?')) this.startClocks();
-                                  },
-                                },
-                              },
-                              'Start all clocks now',
-                            )
-                          : undefined,
-                      ),
-                    ]),
+                    this.bulk.rules
+                      ? h('tr', [
+                          h('th', 'Extra rules'),
+                          h(
+                            'td',
+                            this.bulk.rules.map(r => h('span.badge.rounded-pill.text-bg-secondary.mx-1', r)),
+                          ),
+                        ])
+                      : undefined,
                   ]),
                 ),
               ]),
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
         ,
-        h(
-          'table.table.table-striped.table-hover',
-          {
-            hook: { destroy: () => this.onDestroy() },
-          },
-          [
-            h('thead', [
-              h('tr', [
-                h('th', this.bulk?.games.length + ' games'),
-                h('th', 'White'),
-                h('th', 'Black'),
-                h('th.text-center', 'Result'),
-                h('th.text-end', 'Moves'),
-              ]),
-            ]),
-            h(
-              'tbody',
-              this.games.map(g =>
-                h('tr', { key: g.id }, [
-                  h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
-                  h('td', playerLink(g.players.white)),
-                  h('td', playerLink(g.players.black)),
-                  h('td.mono.text-center', g.result),
-                  h('td.mono.text-end', g.moves),
+        this.bulk
+          ? h(
+              'table.table.table-striped.table-hover',
+              {
+                hook: { destroy: () => this.onDestroy() },
+              },
+              [
+                h('thead', [
+                  h('tr', [
+                    h('th', this.bulk?.games.length + ' games'),
+                    h('th', 'White'),
+                    h('th', 'Black'),
+                    h('th.text-center', 'Result'),
+                    h('th.text-end', 'Moves'),
+                  ]),
                 ]),
-              ),
-            ),
-          ],
-        ),
+                h(
+                  'tbody',
+                  this.games.map(g =>
+                    h('tr', { key: g.id }, [
+                      h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
+                      h('td', playerLink(g.players.white)),
+                      h('td', playerLink(g.players.black)),
+                      h('td.mono.text-center', g.result),
+                      h('td.mono.text-end', g.moves),
+                    ]),
+                  ),
+                ),
+              ],
+            )
+          : undefined,
       ]),
     );
   };
