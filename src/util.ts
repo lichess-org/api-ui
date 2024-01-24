@@ -23,3 +23,5 @@ export const gameRulesExceptNoAbort = gameRules.filter(([key]) => key !== 'noAbo
 export const gameRuleKeysExceptNoAbort = gameRulesExceptNoAbort.map(([key]) => key);
 
 export const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+export const ucfirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

@@ -7,7 +7,7 @@ import { Bulk, BulkId, Game, Player } from '../model';
 import { Stream, readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
-import { sleep } from '../util';
+import { sleep, ucfirst } from '../util';
 
 interface BulkGame {
   id: string;
@@ -71,6 +71,7 @@ export class BulkShow {
       if (this.liveUpdate) return await this.loadGames();
     }
   };
+  static renderClock = (bulk: Bulk) => `${bulk.clock.limit / 60}+${bulk.clock.increment}`;
   private sortGames = () =>
     this.games.sort((a, b) => {
       if (a.result === '*' && b.result !== '*') return -1;
@@ -114,6 +115,16 @@ export class BulkShow {
                 h(
                   'table.table.table-borderless',
                   h('tbody', [
+                    h('tr', [
+                      h('th', 'Setup'),
+                      h('td', [
+                        BulkShow.renderClock(this.bulk),
+                        ' ',
+                        ucfirst(this.bulk.variant),
+                        ' ',
+                        this.bulk.rated ? 'Rated' : 'Casual',
+                      ]),
+                    ]),
                     h('tr', [h('th', 'Created at'), h('td', timeFormat(new Date(this.bulk.scheduledAt)))]),
                     h('tr', [
                       h('th', 'Games scheduled at'),

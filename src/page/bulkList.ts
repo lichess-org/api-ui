@@ -6,6 +6,8 @@ import { timeFormat } from '../view/util';
 import { Bulk } from '../model';
 import { href, url } from '../routing';
 import { bulkPairing } from '../endpoints';
+import { BulkShow } from './bulkShow';
+import { ucfirst } from '../util';
 
 export class BulkList {
   lichessUrl: string;
@@ -48,8 +50,6 @@ export class BulkList {
                 h('tr', [
                   h('th', 'Bulk'),
                   h('th', 'Games'),
-                  h('th', 'Variant'),
-                  h('th', 'Rated'),
                   h('th', 'Created'),
                   h('th', 'Pair at'),
                   h('th', 'Paired'),
@@ -59,10 +59,19 @@ export class BulkList {
                 'tbody',
                 this.bulks.map(bulk =>
                   h('tr', [
-                    h('td.mono', h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, `#${bulk.id}`)),
+                    h(
+                      'td.mono',
+                      h('a', { attrs: href(`${bulkPairing.path}/${bulk.id}`) }, [
+                        `#${bulk.id}`,
+                        ' ',
+                        BulkShow.renderClock(bulk),
+                        ' ',
+                        ucfirst(bulk.variant),
+                        ' ',
+                        bulk.rated ? 'Rated' : 'Casual',
+                      ]),
+                    ),
                     h('td', bulk.games.length),
-                    h('td', bulk.variant),
-                    h('td', bulk.rated ? 'Rated' : 'Casual'),
                     h('td', timeFormat(new Date(bulk.scheduledAt))),
                     h('td', bulk.pairAt && timeFormat(new Date(bulk.pairAt))),
                     h('td', bulk.pairedAt && timeFormat(new Date(bulk.pairedAt))),
