@@ -9,17 +9,17 @@ import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 import { sleep, ucfirst } from '../util';
 
-interface BulkGame {
+interface FormattedGame {
   id: string;
   moves: number;
-  result: string;
+  result: '*' | '1-0' | '0-1' | '½-½';
   players: { white: Player; black: Player };
 }
 
 export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
-  games: BulkGame[] = [];
+  games: FormattedGame[] = [];
   gameStream?: Stream;
   liveUpdate = true;
   constructor(
@@ -44,7 +44,7 @@ export class BulkShow {
         headers: { Accept: 'application/x-ndjson' },
       });
       const handler = (g: Game) => {
-        const game = {
+        const game: FormattedGame = {
           id: g.id,
           players: g.players,
           moves: g.moves ? g.moves.split(' ').length : 0,

@@ -2,6 +2,7 @@ import { h } from 'snabbdom';
 import { variants } from '../util';
 import { MaybeVNodes } from '../interfaces';
 import { Failure, Feedback, isFailure } from '../form';
+import { Rule } from '../model';
 
 export interface Input {
   tpe: string;
@@ -72,7 +73,7 @@ export const variant = () =>
     ),
   ]);
 
-export const specialRules = (rules: [string, string][]) =>
+export const specialRules = (rules: [Rule, string][]) =>
   h('div.mb-3', [
     h('div', label('Special rules', 'rules')),
     ...rules.map(([key, label]) => h('div.form-check.form-switch.mb-1', checkboxWithLabel(key, label))),
