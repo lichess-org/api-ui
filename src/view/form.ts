@@ -3,6 +3,7 @@ import { variants } from '../util';
 import { MaybeVNodes } from '../interfaces';
 import { Failure, Feedback, isFailure } from '../form';
 import { Rule } from '../model';
+import { SavedPlayerUrls } from '../scraper/scraper';
 
 export interface Input {
   tpe: string;
@@ -117,12 +118,19 @@ const renderErrors = (fail: Failure) =>
 export const scrollToForm = () =>
   document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
 
-export const loadPlayersFromUrl = () =>
+export const loadPlayersFromUrl = (savedPlayerUrls?: SavedPlayerUrls) =>
   h('div', [
-    h('div.form-group.mb-3', [label('Pairings URL', 'cr-pairings-url'), input('cr-pairings-url')]),
+    h('div.form-group.mb-3', [
+      label('Pairings URL', 'cr-pairings-url'),
+      input('cr-pairings-url', {
+        value: savedPlayerUrls?.pairingsUrl,
+      }),
+    ]),
     h('div.form-group', [
       label('Players URL', 'cr-players-url'),
-      input('cr-players-url'),
+      input('cr-players-url', {
+        value: savedPlayerUrls?.playersUrl,
+      }),
       h('p.form-text', [
         'Only required if the usernames are not provided on the Pairings page.',
         h('br'),

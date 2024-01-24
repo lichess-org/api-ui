@@ -187,7 +187,7 @@ export class BulkNew {
                     click: () =>
                       this.loadPairingsFromChessResults(
                         document.getElementById('cr-pairings-url') as HTMLInputElement,
-                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                        document.getElementById('cr-players-url') as HTMLInputElement,
                       ),
                   },
                 },
@@ -292,7 +292,6 @@ export class BulkNew {
       const playersUrl = playersInput.value;
 
       const players = playersUrl ? await getPlayers(playersUrl) : undefined;
-
       const pairings = await getPairings(pairingsUrl, players);
       this.insertPairings(pairings);
     } catch (err) {

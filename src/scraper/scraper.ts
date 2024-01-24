@@ -12,7 +12,7 @@ export interface Pairing {
   black: Player;
 }
 
-interface SavedPlayerUrls {
+export interface SavedPlayerUrls {
   pairingsUrl: string;
   playersUrl?: string;
 }
