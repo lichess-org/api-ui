@@ -287,9 +287,6 @@ export class BulkShow {
         p.white.lichess && this.fullNames.set(p.white.lichess, p.white.name);
         p.black.lichess && this.fullNames.set(p.black.lichess, p.black.name);
       });
-
-      this.fullNames.set('bobby', 'Bobby Jones');
-      this.fullNames.set('ana', 'Ana Smith');
     } catch (err) {
       alert(err);
     }
