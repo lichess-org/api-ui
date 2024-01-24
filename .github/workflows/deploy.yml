@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm run prod
       - uses: actions/configure-pages@v4
