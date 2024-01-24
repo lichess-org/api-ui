@@ -138,19 +138,6 @@ export class BulkNew {
     return json;
   };
 
-  private insertPairings(pairings: Pairing[]) {
-    pairings.forEach(pairing => {
-      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
-
-      const white = pairing.white.lichess || `<${pairing.white.name}>`;
-      const black = pairing.black.lichess || `<${pairing.black.name}>`;
-
-      const newLine = `${white} ${black}`;
-      (document.getElementById('players') as HTMLTextAreaElement).value =
-        playersTxt + (playersTxt ? '\n' : '') + newLine;
-    });
-  }
-
   private renderForm = () =>
     form.form(this.onSubmit, [
       form.feedback(this.feedback),
@@ -189,21 +176,7 @@ export class BulkNew {
           h('div.col-md-6', [
             h('details', [
               h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
-              h('div.card.card-body.mb-3', [
-                h('div.form-group.mb-3', [
-                  form.label('Pairings URL', 'cr-pairings-url'),
-                  form.input('cr-pairings-url'),
-                ]),
-                h('div.form-group', [
-                  form.label('Players URL', 'cr-players-url'),
-                  form.input('cr-players-url'),
-                  h('p.form-text', [
-                    'Only required if the usernames are not provided on the Pairings page.',
-                    h('br'),
-                    'The Lichess usernames must be in the "Club/City" field.',
-                  ]),
-                ]),
-              ]),
+              h('div.card.card-body', [form.loadPlayersFromUrl()]),
               h(
                 'button.btn.btn-secondary.btn-sm.mt-3',
                 {
@@ -326,4 +299,17 @@ export class BulkNew {
       alert(err);
     }
   };
+
+  private insertPairings(pairings: Pairing[]) {
+    pairings.forEach(pairing => {
+      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+
+      const white = pairing.white.lichess || `<${pairing.white.name}>`;
+      const black = pairing.black.lichess || `<${pairing.black.name}>`;
+
+      const newLine = `${white} ${black}`;
+      (document.getElementById('players') as HTMLTextAreaElement).value =
+        playersTxt + (playersTxt ? '\n' : '') + newLine;
+    });
+  }
 }

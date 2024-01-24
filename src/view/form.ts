@@ -116,3 +116,17 @@ const renderErrors = (fail: Failure) =>
 
 export const scrollToForm = () =>
   document.getElementById('endpoint-form')?.scrollIntoView({ behavior: 'smooth' });
+
+export const loadPlayersFromUrl = () =>
+  h('div', [
+    h('div.form-group.mb-3', [label('Pairings URL', 'cr-pairings-url'), input('cr-pairings-url')]),
+    h('div.form-group', [
+      label('Players URL', 'cr-players-url'),
+      input('cr-players-url'),
+      h('p.form-text', [
+        'Only required if the usernames are not provided on the Pairings page.',
+        h('br'),
+        'The Lichess usernames must be in the "Club/City" field.',
+      ]),
+    ]),
+  ]);
