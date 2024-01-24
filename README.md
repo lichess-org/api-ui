@@ -22,6 +22,14 @@ pnpm test
 pnpm test:watch
 ```
 
+```bash
+# run prettier
+pnpm format
+
+# check typescript
+pnpm tsc
+```
+
 ## Using a development instance of Lila
 
 Open the browser console and run:
