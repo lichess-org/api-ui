@@ -6,7 +6,7 @@ import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
-import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
+import { Pairing, getPairings, getPlayers, saveUrlsForBulkPairing } from '../scraper/scraper';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 
@@ -110,7 +110,11 @@ export class BulkNew {
         }),
       });
       this.feedback = await responseToFeedback(req);
-      if (isSuccess(this.feedback)) page(`/endpoint/schedule-games/${this.feedback.result.id}`);
+
+      if (isSuccess(this.feedback)) {
+        saveUrlsForBulkPairing(this.feedback.result.id, get('cr-pairings-url'), get('cr-players-url'));
+        page(`/endpoint/schedule-games/${this.feedback.result.id}`);
+      }
     } catch (err) {
       console.warn(err);
       this.feedback = {
