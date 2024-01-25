@@ -12,6 +12,11 @@ export interface Pairing {
   black: Player;
 }
 
+export interface SavedPlayerUrls {
+  pairingsUrl: string;
+  playersUrl?: string;
+}
+
 async function fetchHtml(url: string): Promise<string> {
   const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
   return await response.text();
@@ -174,4 +179,28 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
   });
 
   return pairings;
+}
+
+export function saveUrls(bulkPairingId: string, pairingsUrl: string, playersUrl?: string) {
+  const urls = new Map<string, SavedPlayerUrls>();
+
+  const savedUrls = localStorage.getItem('cr-urls');
+  if (savedUrls) {
+    const parsed: { [key: string]: SavedPlayerUrls } = JSON.parse(savedUrls);
+    Object.keys(parsed).forEach(key => urls.set(key, parsed[key]));
+  }
+
+  urls.set(bulkPairingId, { pairingsUrl, playersUrl });
+  localStorage.setItem('cr-urls', JSON.stringify(Object.fromEntries(urls)));
+}
+
+export function getUrls(bulkPairingId: string): SavedPlayerUrls | undefined {
+  const savedUrls = localStorage.getItem('cr-urls');
+
+  if (!savedUrls) {
+    return undefined;
+  }
+
+  const parsed: { [key: string]: SavedPlayerUrls } = JSON.parse(savedUrls);
+  return parsed[bulkPairingId];
 }

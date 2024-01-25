@@ -1,31 +1,33 @@
 name: Publish the Lichess API UI app
+
 on:
   push:
     branches:
       - main
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: true
+
 jobs:
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
     steps:
-      - uses: actions/checkout@v3
-      - run: npm install
-      - run: npm run prod
-      - uses: actions/configure-pages@v1
-      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/checkout@v4
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run prod
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-      - uses: actions/deploy-pages@v1
+      - uses: actions/deploy-pages@v4
         id: deployment

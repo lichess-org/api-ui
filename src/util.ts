@@ -1,3 +1,5 @@
+import { Rule } from './model';
+
 export const variants = [
   ['standard', 'Standard'],
   ['chess960', 'Chess960'],
@@ -10,7 +12,7 @@ export const variants = [
   ['racingKings', 'RacingKing'],
 ];
 
-export const gameRules: [string, string][] = [
+export const gameRules: [Rule, string][] = [
   ['noAbort', 'Players cannot abort the game'],
   ['noRematch', 'Players cannot offer a rematch'],
   ['noGiveTime', 'Players cannot give extra time'],

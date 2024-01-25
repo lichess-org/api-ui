@@ -3,25 +3,29 @@ import { App } from '../app';
 import { Me } from '../auth';
 import layout from '../view/layout';
 import { timeFormat } from '../view/util';
-import { Bulk, BulkId, Game, Player } from '../model';
+import { Bulk, BulkId, Game, Player, Username } from '../model';
 import { Stream, readStream } from '../ndJsonStream';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 import { sleep, ucfirst } from '../util';
+import { loadPlayersFromUrl } from '../view/form';
+import { getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
 
-interface BulkGame {
+interface FormattedGame {
   id: string;
   moves: number;
-  result: string;
+  result: '*' | '1-0' | '0-1' | '½-½';
   players: { white: Player; black: Player };
+  fullNames: { white?: string; black?: string };
 }
 
 export class BulkShow {
   lichessUrl: string;
   bulk?: Bulk;
-  games: BulkGame[] = [];
+  games: FormattedGame[] = [];
   gameStream?: Stream;
   liveUpdate = true;
+  fullNames = new Map<Username, string>();
   constructor(
     readonly app: App,
     readonly me: Me,
@@ -44,9 +48,13 @@ export class BulkShow {
         headers: { Accept: 'application/x-ndjson' },
       });
       const handler = (g: Game) => {
-        const game = {
+        const game: FormattedGame = {
           id: g.id,
           players: g.players,
+          fullNames: {
+            white: this.fullNames.get(g.players.white.user.id),
+            black: this.fullNames.get(g.players.black.user.id),
+          },
           moves: g.moves ? g.moves.split(' ').length : 0,
           result:
             g.status == 'created' || g.status == 'started'
@@ -125,7 +133,10 @@ export class BulkShow {
                         this.bulk.rated ? 'Rated' : 'Casual',
                       ]),
                     ]),
-                    h('tr', [h('th', 'Created at'), h('td', timeFormat(new Date(this.bulk.scheduledAt)))]),
+                    h('tr', [
+                      h('th.w-25', 'Created at'),
+                      h('td', timeFormat(new Date(this.bulk.scheduledAt))),
+                    ]),
                     h('tr', [
                       h('th', 'Games scheduled at'),
                       h('td', this.bulk.pairAt ? timeFormat(new Date(this.bulk.pairAt)) : 'Now'),
@@ -165,6 +176,41 @@ export class BulkShow {
                         ' / ' + this.bulk.games.length,
                       ]),
                     ]),
+                    h('tr', [
+                      h('th', 'Player names'),
+                      h('td', [
+                        h('details', [
+                          h('summary.text-muted.form-label', 'Load player names from another site'),
+                          h('div.card.card-body', [loadPlayersFromUrl(getUrls(this.bulk.id))]),
+                          h(
+                            'button.btn.btn-secondary.btn-sm.mt-3',
+                            {
+                              attrs: {
+                                type: 'button',
+                              },
+                              on: {
+                                click: () => {
+                                  if (!this.bulk) return;
+
+                                  const pairingsInput = document.getElementById(
+                                    'cr-pairings-url',
+                                  ) as HTMLInputElement;
+                                  const playersInput = document.getElementById(
+                                    'cr-players-url',
+                                  ) as HTMLInputElement;
+
+                                  saveUrls(this.bulk.id, pairingsInput.value, playersInput.value);
+                                  this.loadNamesFromChessResults(pairingsInput, playersInput);
+
+                                  this.loadGames();
+                                },
+                              },
+                            },
+                            'Load names',
+                          ),
+                        ]),
+                      ]),
+                    ]),
                     this.bulk.rules
                       ? h('tr', [
                           h('th', 'Extra rules'),
@@ -191,7 +237,9 @@ export class BulkShow {
                   h('tr', [
                     h('th', this.bulk?.games.length + ' games'),
                     h('th', 'White'),
+                    h('th'),
                     h('th', 'Black'),
+                    h('th'),
                     h('th.text-center', 'Result'),
                     h('th.text-end', 'Moves'),
                   ]),
@@ -202,7 +250,9 @@ export class BulkShow {
                     h('tr', { key: g.id }, [
                       h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
                       h('td', playerLink(g.players.white)),
+                      h('td', g.fullNames.white),
                       h('td', playerLink(g.players.black)),
+                      h('td', g.fullNames.black),
                       h('td.mono.text-center', g.result),
                       h('td.mono.text-end', g.moves),
                     ]),
@@ -214,6 +264,27 @@ export class BulkShow {
       ]),
     );
   };
+
   private lichessLink = (path: string, text: string) =>
     h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
+
+  private loadNamesFromChessResults = async (
+    pairingsInput: HTMLInputElement,
+    playersInput: HTMLInputElement,
+  ) => {
+    try {
+      const pairingsUrl = pairingsInput.value;
+      const playersUrl = playersInput.value;
+
+      const players = playersUrl ? await getPlayers(playersUrl) : undefined;
+      const pairings = await getPairings(pairingsUrl, players);
+
+      pairings.forEach(p => {
+        p.white.lichess && this.fullNames.set(p.white.lichess.toLowerCase(), p.white.name);
+        p.black.lichess && this.fullNames.set(p.black.lichess.toLowerCase(), p.black.name);
+      });
+    } catch (err) {
+      alert(err);
+    }
+  };
 }

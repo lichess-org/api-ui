@@ -6,7 +6,7 @@ import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
-import { Pairing, getPairings, getPlayers } from '../scraper/scraper';
+import { Pairing, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
 import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 
@@ -110,7 +110,11 @@ export class BulkNew {
         }),
       });
       this.feedback = await responseToFeedback(req);
-      if (isSuccess(this.feedback)) page(`/endpoint/schedule-games/${this.feedback.result.id}`);
+
+      if (isSuccess(this.feedback)) {
+        saveUrls(this.feedback.result.id, get('cr-pairings-url'), get('cr-players-url'));
+        page(`/endpoint/schedule-games/${this.feedback.result.id}`);
+      }
     } catch (err) {
       console.warn(err);
       this.feedback = {
@@ -133,19 +137,6 @@ export class BulkNew {
     if (json.error) throw json.error;
     return json;
   };
-
-  private insertPairings(pairings: Pairing[]) {
-    pairings.forEach(pairing => {
-      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
-
-      const white = pairing.white.lichess || `<${pairing.white.name}>`;
-      const black = pairing.black.lichess || `<${pairing.black.name}>`;
-
-      const newLine = `${white} ${black}`;
-      (document.getElementById('players') as HTMLTextAreaElement).value =
-        playersTxt + (playersTxt ? '\n' : '') + newLine;
-    });
-  }
 
   private renderForm = () =>
     form.form(this.onSubmit, [
@@ -185,21 +176,7 @@ export class BulkNew {
           h('div.col-md-6', [
             h('details', [
               h('summary.text-muted.form-label', 'Or load the players and pairings from another website'),
-              h('div.card.card-body.mb-3', [
-                h('div.form-group.mb-3', [
-                  form.label('Pairings URL', 'cr-pairings-url'),
-                  form.input('cr-pairings-url'),
-                ]),
-                h('div.form-group', [
-                  form.label('Players URL', 'cr-players-url'),
-                  form.input('cr-players-url'),
-                  h('p.form-text', [
-                    'Only required if the usernames are not provided on the Pairings page.',
-                    h('br'),
-                    'The Lichess usernames must be in the "Club/City" field.',
-                  ]),
-                ]),
-              ]),
+              h('div.card.card-body', [form.loadPlayersFromUrl()]),
               h(
                 'button.btn.btn-secondary.btn-sm.mt-3',
                 {
@@ -210,7 +187,7 @@ export class BulkNew {
                     click: () =>
                       this.loadPairingsFromChessResults(
                         document.getElementById('cr-pairings-url') as HTMLInputElement,
-                        document.getElementById('cr-pairings-url') as HTMLInputElement,
+                        document.getElementById('cr-players-url') as HTMLInputElement,
                       ),
                   },
                 },
@@ -315,11 +292,23 @@ export class BulkNew {
       const playersUrl = playersInput.value;
 
       const players = playersUrl ? await getPlayers(playersUrl) : undefined;
-
       const pairings = await getPairings(pairingsUrl, players);
       this.insertPairings(pairings);
     } catch (err) {
       alert(err);
     }
   };
+
+  private insertPairings(pairings: Pairing[]) {
+    pairings.forEach(pairing => {
+      const playersTxt = (document.getElementById('players') as HTMLTextAreaElement).value;
+
+      const white = pairing.white.lichess || `<${pairing.white.name}>`;
+      const black = pairing.black.lichess || `<${pairing.black.name}>`;
+
+      const newLine = `${white} ${black}`;
+      (document.getElementById('players') as HTMLTextAreaElement).value =
+        playersTxt + (playersTxt ? '\n' : '') + newLine;
+    });
+  }
 }
