@@ -280,8 +280,8 @@ export class BulkShow {
       const pairings = await getPairings(pairingsUrl, players);
 
       pairings.forEach(p => {
-        p.white.lichess && this.fullNames.set(p.white.lichess, p.white.name);
-        p.black.lichess && this.fullNames.set(p.black.lichess, p.black.name);
+        p.white.lichess && this.fullNames.set(p.white.lichess.toLowerCase(), p.white.name);
+        p.black.lichess && this.fullNames.set(p.black.lichess.toLowerCase(), p.black.name);
       });
     } catch (err) {
       alert(err);
