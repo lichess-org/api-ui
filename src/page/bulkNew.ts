@@ -7,8 +7,8 @@ import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { Pairing, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
-import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
+import { href } from '../view/util';
 
 interface Tokens {
   [username: string]: string;

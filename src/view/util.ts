@@ -1,5 +1,6 @@
 import { h } from 'snabbdom';
 import { MaybeVNodes } from '../interfaces';
+import { BASE_PATH } from '../util';
 
 export const loadingBody = () => h('div.loading', spinner());
 
@@ -48,3 +49,6 @@ export const copyInput = (label: string, value: string) => {
     ]),
   ]);
 };
+
+export const url = (path: string) => `${BASE_PATH}${path}`;
+export const href = (path: string) => ({ href: url(path) });

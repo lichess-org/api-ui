@@ -1,8 +1,8 @@
 import { App } from '../app';
 import { h } from 'snabbdom';
-import { href } from '../routing';
 import layout from '../view/layout';
 import { endpoints } from '../endpoints';
+import { href } from '../view/util';
 
 export class Home {
   constructor(readonly app: App) {}
