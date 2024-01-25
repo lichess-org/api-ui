@@ -11,10 +11,11 @@ import { sleep, ucfirst } from '../util';
 import { loadPlayersFromUrl } from '../view/form';
 import { getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
 
+type Result = '*' | '1-0' | '0-1' | '½-½' | '+--' | '--+';
 interface FormattedGame {
   id: string;
   moves: number;
-  result: '*' | '1-0' | '0-1' | '½-½';
+  result: Result;
   players: { white: Player; black: Player };
   fullNames: { white?: string; black?: string };
 }
@@ -48,6 +49,7 @@ export class BulkShow {
         headers: { Accept: 'application/x-ndjson' },
       });
       const handler = (g: Game) => {
+        const moves = g.moves ? g.moves.split(' ').length : 0;
         const game: FormattedGame = {
           id: g.id,
           players: g.players,
@@ -55,15 +57,8 @@ export class BulkShow {
             white: this.fullNames.get(g.players.white.user.id),
             black: this.fullNames.get(g.players.black.user.id),
           },
-          moves: g.moves ? g.moves.split(' ').length : 0,
-          result:
-            g.status == 'created' || g.status == 'started'
-              ? '*'
-              : g.winner == 'white'
-                ? '1-0'
-                : g.winner == 'black'
-                  ? '0-1'
-                  : '½-½',
+          moves,
+          result: this.gameResult(g.status, g.winner, moves),
         };
         const exists = this.games.findIndex(g => g.id === game.id);
         if (exists >= 0) this.games[exists] = game;
@@ -87,6 +82,19 @@ export class BulkShow {
       if (a.moves !== b.moves) return a.moves < b.moves ? -1 : 1;
       return a.id < b.id ? -1 : 1;
     });
+  private gameResult = (status: string, winner: 'white' | 'black' | undefined, moves: number): Result =>
+    status == 'created' || status == 'started'
+      ? '*'
+      : !winner
+        ? '½-½'
+        : moves > 1
+          ? winner == 'white'
+            ? '1-0'
+            : '0-1'
+          : winner == 'white'
+            ? '+--'
+            : '--+';
+
   private canStartClocks = () =>
     (!this.bulk?.startClocksAt || this.bulk.startClocksAt > Date.now()) && this.games.find(g => g.moves < 2);
   private startClocks = async () => {
