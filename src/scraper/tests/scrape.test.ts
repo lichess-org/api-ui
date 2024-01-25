@@ -1,13 +1,6 @@
 import { describe, expect, test, vi, Mock, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
-import {
-  getPlayers,
-  getPairings,
-  setResultsPerPage,
-  Player,
-  getUrlsForBulkPairing,
-  saveUrlsForBulkPairing,
-} from '../scraper';
+import { getPlayers, getPairings, setResultsPerPage, Player, getUrls, saveUrls } from '../scraper';
 
 global.fetch = vi.fn(proxyUrl => {
   let url = new URL(decodeURIComponent(proxyUrl.split('?')[1]));
@@ -254,25 +247,25 @@ describe('get/set urls from local storage', () => {
   });
 
   test('get', () => {
-    expect(getUrlsForBulkPairing('abc1')).toBeUndefined();
+    expect(getUrls('abc1')).toBeUndefined();
   });
 
   test('set', () => {
-    saveUrlsForBulkPairing('abc2', 'https://example.com/pairings2.html');
-    expect(getUrlsForBulkPairing('abc2')).toStrictEqual({
+    saveUrls('abc2', 'https://example.com/pairings2.html');
+    expect(getUrls('abc2')).toStrictEqual({
       pairingsUrl: 'https://example.com/pairings2.html',
     });
   });
 
   test('append', () => {
-    saveUrlsForBulkPairing('abc3', 'https://example.com/pairings3.html');
-    saveUrlsForBulkPairing('abc4', 'https://example.com/pairings4.html');
+    saveUrls('abc3', 'https://example.com/pairings3.html');
+    saveUrls('abc4', 'https://example.com/pairings4.html');
 
-    expect(getUrlsForBulkPairing('abc3')).toStrictEqual({
+    expect(getUrls('abc3')).toStrictEqual({
       pairingsUrl: 'https://example.com/pairings3.html',
     });
 
-    expect(getUrlsForBulkPairing('abc4')).toStrictEqual({
+    expect(getUrls('abc4')).toStrictEqual({
       pairingsUrl: 'https://example.com/pairings4.html',
     });
   });

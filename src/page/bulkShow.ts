@@ -9,7 +9,7 @@ import { href } from '../routing';
 import { bulkPairing } from '../endpoints';
 import { sleep, ucfirst } from '../util';
 import { loadPlayersFromUrl } from '../view/form';
-import { getPairings, getPlayers, getUrlsForBulkPairing, saveUrlsForBulkPairing } from '../scraper/scraper';
+import { getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
 
 interface FormattedGame {
   id: string;
@@ -181,7 +181,7 @@ export class BulkShow {
                       h('td', [
                         h('details', [
                           h('summary.text-muted.form-label', 'Load player names from another site'),
-                          h('div.card.card-body', [loadPlayersFromUrl(getUrlsForBulkPairing(this.bulk.id))]),
+                          h('div.card.card-body', [loadPlayersFromUrl(getUrls(this.bulk.id))]),
                           h(
                             'button.btn.btn-secondary.btn-sm.mt-3',
                             {
@@ -199,11 +199,7 @@ export class BulkShow {
                                     'cr-players-url',
                                   ) as HTMLInputElement;
 
-                                  saveUrlsForBulkPairing(
-                                    this.bulk.id,
-                                    pairingsInput.value,
-                                    playersInput.value,
-                                  );
+                                  saveUrls(this.bulk.id, pairingsInput.value, playersInput.value);
                                   this.loadNamesFromChessResults(pairingsInput, playersInput);
 
                                   this.loadGames();

@@ -181,26 +181,26 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
   return pairings;
 }
 
-export function saveUrlsForBulkPairing(bulkPairingId: string, pairingsUrl: string, playersUrl?: string) {
-  const savedUrls = new Map<string, SavedPlayerUrls>();
+export function saveUrls(bulkPairingId: string, pairingsUrl: string, playersUrl?: string) {
+  const urls = new Map<string, SavedPlayerUrls>();
 
-  const currentEntries = localStorage.getItem('cr-urls');
-  if (currentEntries) {
-    const parsedEntries: { [key: string]: SavedPlayerUrls } = JSON.parse(currentEntries);
-    Object.keys(parsedEntries).forEach(key => savedUrls.set(key, parsedEntries[key]));
+  const savedUrls = localStorage.getItem('cr-urls');
+  if (savedUrls) {
+    const parsed: { [key: string]: SavedPlayerUrls } = JSON.parse(savedUrls);
+    Object.keys(parsed).forEach(key => urls.set(key, parsed[key]));
   }
 
-  savedUrls.set(bulkPairingId, { pairingsUrl, playersUrl });
-  localStorage.setItem('cr-urls', JSON.stringify(Object.fromEntries(savedUrls)));
+  urls.set(bulkPairingId, { pairingsUrl, playersUrl });
+  localStorage.setItem('cr-urls', JSON.stringify(Object.fromEntries(urls)));
 }
 
-export function getUrlsForBulkPairing(bulkPairingId: string): SavedPlayerUrls | undefined {
-  const currentEntries = localStorage.getItem('cr-urls');
+export function getUrls(bulkPairingId: string): SavedPlayerUrls | undefined {
+  const savedUrls = localStorage.getItem('cr-urls');
 
-  if (!currentEntries) {
+  if (!savedUrls) {
     return undefined;
   }
 
-  const parsedEntries: { [key: string]: SavedPlayerUrls } = JSON.parse(currentEntries);
-  return parsedEntries[bulkPairingId];
+  const parsed: { [key: string]: SavedPlayerUrls } = JSON.parse(savedUrls);
+  return parsed[bulkPairingId];
 }
