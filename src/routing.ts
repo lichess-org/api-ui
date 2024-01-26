@@ -7,6 +7,7 @@ import { PuzzleRace } from './page/puzzleRace';
 import { BulkList } from './page/bulkList';
 import { Me } from './auth';
 import { BulkShow } from './page/bulkShow';
+import { BASE_PATH } from './util';
 
 export default function (app: App) {
   const withAuth = (f: (me: Me) => void) => {
@@ -36,8 +37,3 @@ export default function (app: App) {
   page('*', _ => app.notFound());
   page({ hashbang: true });
 }
-
-export const BASE_PATH = location.pathname.replace(/\/$/, '');
-
-export const url = (path: string) => `${BASE_PATH}${path}`;
-export const href = (path: string) => ({ href: url(path) });

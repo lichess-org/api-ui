@@ -2,8 +2,8 @@ import { h, VNode } from 'snabbdom';
 import { Me } from '../auth';
 import { App } from '../app';
 import { MaybeVNodes } from '../interfaces';
-import { href } from '../routing';
 import { endpoints } from '../endpoints';
+import { href } from './util';
 
 export default function (app: App, body: MaybeVNodes): VNode {
   return h('body', [renderNavBar(app), h('div.container', body), renderFooter(app)]);

@@ -1,5 +1,7 @@
 import { Rule } from './model';
 
+export const BASE_PATH = location.pathname.replace(/\/$/, '');
+
 export const variants = [
   ['standard', 'Standard'],
   ['chess960', 'Chess960'],
