@@ -55,6 +55,7 @@ describe('fetch pairings', () => {
           rating: 1985,
         },
         reversed: false,
+        board: '1.1',
       },
       {
         black: {
@@ -68,6 +69,7 @@ describe('fetch pairings', () => {
           rating: 0,
         },
         reversed: true,
+        board: '1.2',
       },
       {
         black: {
@@ -81,6 +83,7 @@ describe('fetch pairings', () => {
           rating: 1900,
         },
         reversed: false,
+        board: '1.3',
       },
       {
         black: {
@@ -94,6 +97,7 @@ describe('fetch pairings', () => {
           rating: 0,
         },
         reversed: true,
+        board: '1.4',
       },
       {
         black: {
@@ -107,6 +111,7 @@ describe('fetch pairings', () => {
           rating: 0,
         },
         reversed: false,
+        board: '2.1',
       },
       {
         black: {
@@ -120,6 +125,7 @@ describe('fetch pairings', () => {
           rating: 2070,
         },
         reversed: true,
+        board: '2.2',
       },
       {
         black: {
@@ -133,6 +139,7 @@ describe('fetch pairings', () => {
           rating: 1270,
         },
         reversed: false,
+        board: '2.3',
       },
       {
         black: {
@@ -146,6 +153,7 @@ describe('fetch pairings', () => {
           rating: 1111,
         },
         reversed: true,
+        board: '2.4',
       },
     ]);
   });
@@ -166,6 +174,7 @@ describe('fetch pairings', () => {
         lichess: undefined,
       },
       reversed: false,
+      board: '1.1',
     });
     expect(pairings[1]).toEqual({
       black: {
@@ -179,6 +188,7 @@ describe('fetch pairings', () => {
         lichess: undefined,
       },
       reversed: true,
+      board: '1.2',
     });
   });
 
@@ -194,6 +204,7 @@ describe('fetch pairings', () => {
         name: 'Galaktionov, Artem',
       },
       reversed: false,
+      board: '1',
     });
   });
 
@@ -209,6 +220,7 @@ describe('fetch pairings', () => {
         name: 'Mammadzada, Gunay',
       },
       reversed: false,
+      board: '1',
     });
   });
 
@@ -236,6 +248,7 @@ describe('fetch pairings', () => {
         lichess: 'test-gunay',
       },
       reversed: false,
+      board: '1',
     });
   });
 });

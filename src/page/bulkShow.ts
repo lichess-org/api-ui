@@ -289,6 +289,7 @@ export class BulkShow {
 
       if (!pairing.reversed) {
         return {
+          board: pairing.board,
           name1: pairing.white.name,
           name2: pairing.black.name,
           result: game?.result,
@@ -296,6 +297,7 @@ export class BulkShow {
         };
       } else {
         return {
+          board: pairing.board,
           name1: pairing.black.name,
           name2: pairing.white.name,
           result: game?.result.split('').reverse().join(''),
@@ -316,6 +318,7 @@ export class BulkShow {
             'tbody',
             results.map(result =>
               h('tr', { key: result.name1 }, [
+                h('td.mono', result.board),
                 h('td', result.reversed ? '' : 'w'),
                 h('td', result.name1),
                 h('td.mono.text-center.table-secondary', result.result),
