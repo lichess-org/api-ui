@@ -54,6 +54,7 @@ describe('fetch pairings', () => {
           name: 'Testing, Test',
           rating: 1985,
         },
+        reversed: false,
       },
       {
         black: {
@@ -66,6 +67,7 @@ describe('fetch pairings', () => {
           name: 'Trevlar, Someone',
           rating: 0,
         },
+        reversed: true,
       },
       {
         black: {
@@ -78,6 +80,7 @@ describe('fetch pairings', () => {
           name: 'Another, Test',
           rating: 1900,
         },
+        reversed: false,
       },
       {
         black: {
@@ -90,6 +93,7 @@ describe('fetch pairings', () => {
           name: 'Testing, Tester',
           rating: 0,
         },
+        reversed: true,
       },
       {
         black: {
@@ -102,6 +106,7 @@ describe('fetch pairings', () => {
           name: 'Wait, Theophilus',
           rating: 0,
         },
+        reversed: false,
       },
       {
         black: {
@@ -114,6 +119,7 @@ describe('fetch pairings', () => {
           name: 'YetSomeoneElse, Lilly',
           rating: 2070,
         },
+        reversed: true,
       },
       {
         black: {
@@ -126,6 +132,7 @@ describe('fetch pairings', () => {
           name: 'Gkizi, Konst',
           rating: 1270,
         },
+        reversed: false,
       },
       {
         black: {
@@ -138,6 +145,7 @@ describe('fetch pairings', () => {
           name: 'Also, Unknown',
           rating: 1111,
         },
+        reversed: true,
       },
     ]);
   });
@@ -157,6 +165,7 @@ describe('fetch pairings', () => {
         rating: 2789,
         lichess: undefined,
       },
+      reversed: false,
     });
     expect(pairings[1]).toEqual({
       black: {
@@ -169,6 +178,7 @@ describe('fetch pairings', () => {
         rating: 2368,
         lichess: undefined,
       },
+      reversed: true,
     });
   });
 
@@ -183,6 +193,7 @@ describe('fetch pairings', () => {
       black: {
         name: 'Galaktionov, Artem',
       },
+      reversed: false,
     });
   });
 
@@ -197,6 +208,7 @@ describe('fetch pairings', () => {
       black: {
         name: 'Mammadzada, Gunay',
       },
+      reversed: false,
     });
   });
 
@@ -223,6 +235,7 @@ describe('fetch pairings', () => {
         name: 'Mammadzada, Gunay',
         lichess: 'test-gunay',
       },
+      reversed: false,
     });
   });
 });

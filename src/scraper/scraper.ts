@@ -10,6 +10,8 @@ export interface Player {
 export interface Pairing {
   white: Player;
   black: Player;
+  /** Whether the pairing should be displayed as "black vs white" instead of "white vs black" */
+  reversed: boolean;
 }
 
 export interface SavedPlayerUrls {
@@ -130,6 +132,7 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
           rating: rating2,
           lichess: username2,
         },
+        reversed: false,
       });
     } else if ($(firstDiv).hasClass('FarbesT')) {
       pairings.push({
@@ -143,6 +146,7 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
           rating: rating1,
           lichess: username1,
         },
+        reversed: true,
       });
     } else {
       throw new Error('Could not parse Pairings table');
@@ -175,6 +179,7 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
     pairings.push({
       white: players?.find(player => player.name === whiteName) ?? { name: whiteName },
       black: players?.find(player => player.name === blackName) ?? { name: blackName },
+      reversed: false,
     });
   });
 
