@@ -54,6 +54,8 @@ describe('fetch pairings', () => {
           name: 'Testing, Test',
           rating: 1985,
         },
+        reversed: false,
+        board: '1.1',
       },
       {
         black: {
@@ -66,6 +68,8 @@ describe('fetch pairings', () => {
           name: 'Trevlar, Someone',
           rating: 0,
         },
+        reversed: true,
+        board: '1.2',
       },
       {
         black: {
@@ -78,6 +82,8 @@ describe('fetch pairings', () => {
           name: 'Another, Test',
           rating: 1900,
         },
+        reversed: false,
+        board: '1.3',
       },
       {
         black: {
@@ -90,6 +96,8 @@ describe('fetch pairings', () => {
           name: 'Testing, Tester',
           rating: 0,
         },
+        reversed: true,
+        board: '1.4',
       },
       {
         black: {
@@ -102,6 +110,8 @@ describe('fetch pairings', () => {
           name: 'Wait, Theophilus',
           rating: 0,
         },
+        reversed: false,
+        board: '2.1',
       },
       {
         black: {
@@ -114,6 +124,8 @@ describe('fetch pairings', () => {
           name: 'YetSomeoneElse, Lilly',
           rating: 2070,
         },
+        reversed: true,
+        board: '2.2',
       },
       {
         black: {
@@ -126,6 +138,8 @@ describe('fetch pairings', () => {
           name: 'Gkizi, Konst',
           rating: 1270,
         },
+        reversed: false,
+        board: '2.3',
       },
       {
         black: {
@@ -138,6 +152,8 @@ describe('fetch pairings', () => {
           name: 'Also, Unknown',
           rating: 1111,
         },
+        reversed: true,
+        board: '2.4',
       },
     ]);
   });
@@ -157,6 +173,8 @@ describe('fetch pairings', () => {
         rating: 2789,
         lichess: undefined,
       },
+      reversed: false,
+      board: '1.1',
     });
     expect(pairings[1]).toEqual({
       black: {
@@ -169,6 +187,8 @@ describe('fetch pairings', () => {
         rating: 2368,
         lichess: undefined,
       },
+      reversed: true,
+      board: '1.2',
     });
   });
 
@@ -183,6 +203,8 @@ describe('fetch pairings', () => {
       black: {
         name: 'Galaktionov, Artem',
       },
+      reversed: false,
+      board: '1',
     });
   });
 
@@ -197,6 +219,8 @@ describe('fetch pairings', () => {
       black: {
         name: 'Mammadzada, Gunay',
       },
+      reversed: false,
+      board: '1',
     });
   });
 
@@ -223,6 +247,8 @@ describe('fetch pairings', () => {
         name: 'Mammadzada, Gunay',
         lichess: 'test-gunay',
       },
+      reversed: false,
+      board: '1',
     });
   });
 });

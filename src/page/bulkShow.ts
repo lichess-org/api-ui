@@ -8,7 +8,7 @@ import { Stream, readStream } from '../ndJsonStream';
 import { bulkPairing } from '../endpoints';
 import { sleep, ucfirst } from '../util';
 import { loadPlayersFromUrl } from '../view/form';
-import { getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
+import { Pairing, getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
 
 type Result = '*' | '1-0' | '0-1' | '½-½' | '+--' | '--+';
 interface FormattedGame {
@@ -26,6 +26,7 @@ export class BulkShow {
   gameStream?: Stream;
   liveUpdate = true;
   fullNames = new Map<Username, string>();
+  crPairings: Pairing[] = [];
   constructor(
     readonly app: App,
     readonly me: Me,
@@ -39,7 +40,7 @@ export class BulkShow {
     this.bulk = await res.json();
     this.redraw();
   };
-  loadGames = async (): Promise<void> => {
+  loadGames = async (forceUpdate: boolean = false): Promise<void> => {
     this.gameStream?.close();
     if (this.bulk) {
       const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/games/export/_ids`, {
@@ -70,7 +71,7 @@ export class BulkShow {
       const empty = this.games.length == 0;
       await sleep((empty ? 1 : 5) * 1000);
       this.liveUpdate = this.liveUpdate && (empty || !!this.games.find(g => g.result === '*'));
-      if (this.liveUpdate) return await this.loadGames();
+      if (this.liveUpdate || forceUpdate) return await this.loadGames();
     }
   };
   static renderClock = (bulk: Bulk) => `${bulk.clock.limit / 60}+${bulk.clock.increment}`;
@@ -111,11 +112,6 @@ export class BulkShow {
   };
   redraw = () => this.app.redraw(this.render());
   render = () => {
-    const playerLink = (player: Player) =>
-      this.lichessLink(
-        '@/' + player.user.name,
-        `${player.user.title ? player.user.title + ' ' : ''}${player.user.name}`,
-      );
     return layout(
       this.app,
       h('div', [
@@ -209,7 +205,7 @@ export class BulkShow {
                                   saveUrls(this.bulk.id, pairingsInput.value, playersInput.value);
                                   this.loadNamesFromChessResults(pairingsInput, playersInput);
 
-                                  this.loadGames();
+                                  this.loadGames(true);
                                 },
                               },
                             },
@@ -233,43 +229,101 @@ export class BulkShow {
             ])
           : h('div.m-5', h('div.spinner-border.d-block.mx-auto', { attrs: { role: 'status' } })),
         ,
-        this.bulk
-          ? h(
-              'table.table.table-striped.table-hover',
-              {
-                hook: { destroy: () => this.onDestroy() },
-              },
-              [
-                h('thead', [
-                  h('tr', [
-                    h('th', this.bulk?.games.length + ' games'),
-                    h('th', 'White'),
-                    h('th'),
-                    h('th', 'Black'),
-                    h('th'),
-                    h('th.text-center', 'Result'),
-                    h('th.text-end', 'Moves'),
-                  ]),
-                ]),
-                h(
-                  'tbody',
-                  this.games.map(g =>
-                    h('tr', { key: g.id }, [
-                      h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
-                      h('td', playerLink(g.players.white)),
-                      h('td', g.fullNames.white),
-                      h('td', playerLink(g.players.black)),
-                      h('td', g.fullNames.black),
-                      h('td.mono.text-center', g.result),
-                      h('td.mono.text-end', g.moves),
-                    ]),
-                  ),
-                ),
-              ],
-            )
-          : undefined,
+        this.bulk ? h('div', [this.renderDefaultView(), this.renderChessResultsView()]) : undefined,
       ]),
     );
+  };
+
+  renderDefaultView = () => {
+    const playerLink = (player: Player) =>
+      this.lichessLink(
+        '@/' + player.user.name,
+        `${player.user.title ? player.user.title + ' ' : ''}${player.user.name}`,
+      );
+    return h(
+      'table.table.table-striped.table-hover',
+      {
+        hook: { destroy: () => this.onDestroy() },
+      },
+      [
+        h('thead', [
+          h('tr', [
+            h('th', this.bulk?.games.length + ' games'),
+            h('th', 'White'),
+            h('th'),
+            h('th', 'Black'),
+            h('th'),
+            h('th.text-center', 'Result'),
+            h('th.text-end', 'Moves'),
+          ]),
+        ]),
+        h(
+          'tbody',
+          this.games.map(g =>
+            h('tr', { key: g.id }, [
+              h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
+              h('td', playerLink(g.players.white)),
+              h('td', g.fullNames.white),
+              h('td', playerLink(g.players.black)),
+              h('td', g.fullNames.black),
+              h('td.mono.text-center', g.result),
+              h('td.mono.text-end', g.moves),
+            ]),
+          ),
+        ),
+      ],
+    );
+  };
+
+  renderChessResultsView = () => {
+    if (this.crPairings.length === 0) {
+      return;
+    }
+
+    const results = this.crPairings.map(pairing => {
+      const game = this.games.find(
+        game =>
+          game.players.white.user.id === pairing.white.lichess?.toLowerCase() &&
+          game.players.black.user.id === pairing.black.lichess?.toLowerCase(),
+      );
+
+      if (!pairing.reversed) {
+        return {
+          board: pairing.board,
+          name1: pairing.white.name,
+          name2: pairing.black.name,
+          result: game?.result,
+          reversed: pairing.reversed,
+        };
+      } else {
+        return {
+          board: pairing.board,
+          name1: pairing.black.name,
+          name2: pairing.white.name,
+          result: game?.result.split('').reverse().join(''),
+          reversed: pairing.reversed,
+        };
+      }
+    });
+
+    return h('div.mt-5', [
+      h('h4', 'Chess Results View'),
+      h('table.table.table-striped.table-hover', [
+        h(
+          'tbody',
+          results.map(result =>
+            h('tr', { key: result.name1 }, [
+              h('td.mono', result.board),
+              h('td', result.reversed ? '' : 'w'),
+              h('td', result.name1),
+              h('td.mono.text-center.table-secondary', result.result),
+              h('td', result.reversed ? 'w' : ''),
+              h('td', result.name2),
+            ]),
+          ),
+        ),
+      ]),
+    ]);
   };
 
   private lichessLink = (path: string, text: string) =>
@@ -284,9 +338,9 @@ export class BulkShow {
       const playersUrl = playersInput.value;
 
       const players = playersUrl ? await getPlayers(playersUrl) : undefined;
-      const pairings = await getPairings(pairingsUrl, players);
+      this.crPairings = await getPairings(pairingsUrl, players);
 
-      pairings.forEach(p => {
+      this.crPairings.forEach(p => {
         p.white.lichess && this.fullNames.set(p.white.lichess.toLowerCase(), p.white.name);
         p.black.lichess && this.fullNames.set(p.black.lichess.toLowerCase(), p.black.name);
       });

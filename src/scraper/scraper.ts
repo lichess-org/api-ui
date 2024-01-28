@@ -10,6 +10,9 @@ export interface Player {
 export interface Pairing {
   white: Player;
   black: Player;
+  /** Whether the pairing should be displayed as "black vs white" instead of "white vs black" */
+  reversed: boolean;
+  board: string;
 }
 
 export interface SavedPlayerUrls {
@@ -98,6 +101,7 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
       return;
     }
 
+    const boardNumber = $(element).children().eq(0).text().trim();
     const white = $(element).find('table').find('div.FarbewT').parentsUntil('table').last().text().trim();
     const black = $(element).find('table').find('div.FarbesT').parentsUntil('table').last().text().trim();
 
@@ -130,6 +134,8 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
           rating: rating2,
           lichess: username2,
         },
+        reversed: false,
+        board: boardNumber,
       });
     } else if ($(firstDiv).hasClass('FarbesT')) {
       pairings.push({
@@ -143,6 +149,8 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
           rating: rating1,
           lichess: username1,
         },
+        reversed: true,
+        board: boardNumber,
       });
     } else {
       throw new Error('Could not parse Pairings table');
@@ -169,12 +177,15 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
       return;
     }
 
+    const boardNumber = $(element).children().eq(0).text().trim();
     const whiteName = $(element).children().eq(headers.indexOf('Name')).text().trim();
     const blackName = $(element).children().eq(headers.lastIndexOf('Name')).text().trim();
 
     pairings.push({
       white: players?.find(player => player.name === whiteName) ?? { name: whiteName },
       black: players?.find(player => player.name === blackName) ?? { name: blackName },
+      reversed: false,
+      board: boardNumber,
     });
   });
 
