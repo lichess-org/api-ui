@@ -308,27 +308,21 @@ export class BulkShow {
 
     return h('div.mt-5', [
       h('h4', 'Chess Results View'),
-      h(
-        'table.table.table-striped.table-hover',
-        {
-          hook: { destroy: () => this.onDestroy() },
-        },
-        [
-          h(
-            'tbody',
-            results.map(result =>
-              h('tr', { key: result.name1 }, [
-                h('td.mono', result.board),
-                h('td', result.reversed ? '' : 'w'),
-                h('td', result.name1),
-                h('td.mono.text-center.table-secondary', result.result),
-                h('td', result.reversed ? 'w' : ''),
-                h('td', result.name2),
-              ]),
-            ),
+      h('table.table.table-striped.table-hover', [
+        h(
+          'tbody',
+          results.map(result =>
+            h('tr', { key: result.name1 }, [
+              h('td.mono', result.board),
+              h('td', result.reversed ? '' : 'w'),
+              h('td', result.name1),
+              h('td.mono.text-center.table-secondary', result.result),
+              h('td', result.reversed ? 'w' : ''),
+              h('td', result.name2),
+            ]),
           ),
-        ],
-      ),
+        ),
+      ]),
     ]);
   };
 
