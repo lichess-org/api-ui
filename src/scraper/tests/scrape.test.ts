@@ -1,6 +1,14 @@
 import { describe, expect, test, vi, Mock, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
-import { getPlayers, getPairings, setResultsPerPage, Player, getUrls, saveUrls } from '../scraper';
+import {
+  getPlayers,
+  getPairings,
+  setResultsPerPage,
+  Player,
+  getUrls,
+  saveUrls,
+  setCacheBuster,
+} from '../scraper';
 
 global.fetch = vi.fn(proxyUrl => {
   let url = new URL(decodeURIComponent(proxyUrl.split('?')[1]));
@@ -158,6 +166,70 @@ describe('fetch pairings', () => {
     ]);
   });
 
+  test('team another swiss', async () => {
+    const pairings = await getPairings('https://example.com/team-swiss-pairings-with-usernames-2.html');
+
+    expect(pairings).toHaveLength(4);
+    expect(pairings).toStrictEqual([
+      {
+        black: {
+          lichess: 'ttrv',
+          name: 'ttrvraw, ttrvdae',
+          rating: 0,
+        },
+        white: {
+          lichess: 'cynosure',
+          name: 'cybosu, dsad',
+          rating: 0,
+        },
+        reversed: false,
+        board: '1.1',
+      },
+      {
+        black: {
+          lichess: 'e4',
+          name: 'someonesalt, somealt',
+          rating: 0,
+        },
+        white: {
+          lichess: 'lovlas',
+          name: 'lovlaswa, lovlasdw',
+          rating: 2400,
+        },
+        reversed: true,
+        board: '1.2',
+      },
+      {
+        black: {
+          lichess: 'carpentum',
+          name: 'carpentumsaw, carpentumsad',
+          rating: 0,
+        },
+        white: {
+          lichess: 'thibault',
+          name: 'thibault1, test1',
+          rating: 0,
+        },
+        reversed: false,
+        board: '2.1',
+      },
+      {
+        black: {
+          lichess: 'neio',
+          name: 'neio123, neioe2qe',
+          rating: 0,
+        },
+        white: {
+          lichess: 'Puzzlingpuzzler',
+          name: 'puzzlingpuzzlerpux, puzzler',
+          rating: 0,
+        },
+        reversed: true,
+        board: '2.2',
+      },
+    ]);
+  });
+
   test('team swiss w/o lichess usernames on the same page', async () => {
     const pairings = await getPairings('https://example.com/team-swiss-pairings-without-usernames.html');
 
@@ -205,6 +277,40 @@ describe('fetch pairings', () => {
       },
       reversed: false,
       board: '1',
+    });
+  });
+
+  test('team round robin', async () => {
+    const pairings = await getPairings('https://example.com/team-round-robin-pairings.html');
+
+    expect(pairings).toHaveLength(12);
+    expect(pairings[0]).toEqual({
+      white: {
+        name: 'ANotehrnotTest, wadfaeefa',
+        lichess: 'Testacct31',
+        rating: 2100,
+      },
+      black: {
+        name: 'Teambtest, sadsaf',
+        lichess: 'Testacct11',
+        rating: 0,
+      },
+      reversed: false,
+      board: '1.1',
+    });
+    expect(pairings[1]).toEqual({
+      white: {
+        name: 'Teamseers, Steasdea',
+        lichess: 'Testacct12',
+        rating: 1670,
+      },
+      black: {
+        name: 'czxzszcsszc, zxcszczs',
+        lichess: 'Testacct33',
+        rating: 0,
+      },
+      reversed: true,
+      board: '1.2',
     });
   });
 
@@ -294,5 +400,17 @@ describe('get/set urls from local storage', () => {
     expect(getUrls('abc4')).toStrictEqual({
       pairingsUrl: 'https://example.com/pairings4.html',
     });
+  });
+});
+
+describe('test cache buster', () => {
+  test('set cache buster', () => {
+    expect(setCacheBuster('https://example.com')).toContain('https://example.com/?cachebust=1');
+  });
+
+  test('append cache buster', () => {
+    expect(setCacheBuster('https://example.com/?foo=bar')).toContain(
+      'https://example.com/?foo=bar&cachebust=1',
+    );
   });
 });
