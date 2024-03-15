@@ -20,8 +20,14 @@ export interface SavedPlayerUrls {
   playersUrl?: string;
 }
 
+export function setCacheBuster(url: string): string {
+  const urlObject = new URL(url);
+  urlObject.searchParams.set('cachebust', Date.now().toString());
+  return urlObject.toString();
+}
+
 async function fetchHtml(url: string): Promise<string> {
-  const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+  const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(setCacheBuster(url))}`);
   return await response.text();
 }
 
