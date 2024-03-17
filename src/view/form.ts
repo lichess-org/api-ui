@@ -36,11 +36,11 @@ export const label = (label: string, id?: string) =>
 
 export const selectOption = (value: string, label: string) => h('option', { attrs: { value } }, label);
 
-export const checkbox = (id: string) =>
-  h(`input#${id}.form-check-input`, { attrs: { type: 'checkbox', name: id, value: 'true' } });
+export const checkbox = (id: string, checked: boolean = false) =>
+  h(`input#${id}.form-check-input`, { attrs: { type: 'checkbox', name: id, value: 'true', checked } });
 
-export const checkboxWithLabel = (id: string, label: string) => [
-  checkbox(id),
+export const checkboxWithLabel = (id: string, label: string, checked: boolean = false) => [
+  checkbox(id, checked),
   h('label.form-check-label', { attrs: { for: id } }, label),
 ];
 
