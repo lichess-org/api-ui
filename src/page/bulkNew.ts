@@ -198,7 +198,7 @@ export class BulkNew {
         ]),
       ]),
       form.clock(),
-      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games')),
+      h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games', true)),
       form.variant(),
       form.fen(),
       h('div.mb-3', [
