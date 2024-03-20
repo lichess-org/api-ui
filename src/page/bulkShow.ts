@@ -223,6 +223,28 @@ export class BulkShow {
                           ),
                         ])
                       : undefined,
+                    h('tr', [
+                      h('th', 'Game IDs'),
+                      h('td', [
+                        h('details', [
+                          h(
+                            'summary.text-muted.form-label',
+                            'Show individual game IDs for a Lichess Broadcast',
+                          ),
+                          h('div.card.card-body', [
+                            h(
+                              'textarea.form-control',
+                              { attrs: { rows: 2, spellcheck: 'false', onfocus: 'this.select()' } },
+                              this.games.map(g => g.id).join(' '),
+                            ),
+                            h(
+                              'small.form-text.text-muted',
+                              'Copy and paste these when setting up a Lichess Broadcast Round',
+                            ),
+                          ]),
+                        ]),
+                      ]),
+                    ]),
                   ]),
                 ),
               ]),
