@@ -283,7 +283,7 @@ export class BulkShow {
           'tbody',
           this.games.map(g =>
             h('tr', { key: g.id }, [
-              h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
+              h('td.mono.col-2', this.lichessLink(g.id, `#${g.id}`)),
               h('td', playerLink(g.players.white)),
               h('td', g.fullNames.white),
               h('td', playerLink(g.players.black)),
@@ -302,7 +302,14 @@ export class BulkShow {
       return;
     }
 
-    const results = this.crPairings.map(pairing => {
+    const results: {
+      gameId?: string;
+      board: string;
+      name1: string;
+      name2: string;
+      result?: string;
+      reversed: boolean;
+    }[] = this.crPairings.map(pairing => {
       const game = this.games.find(
         game =>
           game.players.white.user.id === pairing.white.lichess?.toLowerCase() &&
@@ -311,6 +318,7 @@ export class BulkShow {
 
       if (!pairing.reversed) {
         return {
+          gameId: game?.id,
           board: pairing.board,
           name1: pairing.white.name,
           name2: pairing.black.name,
@@ -319,6 +327,7 @@ export class BulkShow {
         };
       } else {
         return {
+          gameId: game?.id,
           board: pairing.board,
           name1: pairing.black.name,
           name2: pairing.white.name,
@@ -335,6 +344,7 @@ export class BulkShow {
           'tbody',
           results.map(result =>
             h('tr', { key: result.name1 }, [
+              h('td.mono.col-2', result.gameId ? this.lichessLink(result.gameId, `#${result.gameId}`) : null),
               h('td.mono', result.board),
               h('td', result.reversed ? '' : 'w'),
               h('td', result.name1),
