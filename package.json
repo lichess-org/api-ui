@@ -4,10 +4,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "~2.13.0",
-    "bootstrap": "~5.3.2",
+    "bootstrap": "~5.3.3",
     "cheerio": "1.0.0-rc.12",
     "page": "~1.11.6",
-    "snabbdom": "~3.6.0"
+    "snabbdom": "~3.6.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -15,17 +15,17 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/cheerio": "^0.22.35",
-    "@types/node": "^20.11.8",
+    "@types/node": "^20.11.30",
     "@types/page": "^1.11.9",
     "http-server": "^14.1.1",
     "jsdom": "^24.0.0",
     "prettier": "^3.2.5",
-    "rollup": "^4.9.6",
+    "rollup": "^4.13.0",
     "rollup-plugin-scss": "~4.0.0",
-    "sass": "~1.70.0",
+    "sass": "^1.72.0",
     "tslib": "~2.6.2",
-    "typescript": "~5.3.3",
-    "vitest": "^1.2.2"
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
   },
   "scripts": {
     "build": "rollup --config",
