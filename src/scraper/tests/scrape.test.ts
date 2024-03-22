@@ -55,11 +55,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'test4',
           name: 'Hris, Panagiotis',
+          team: 'Team C',
           rating: 2227,
         },
         white: {
           lichess: 'test134',
           name: 'Testing, Test',
+          team: 'Team B',
           rating: 1985,
         },
         reversed: false,
@@ -69,11 +71,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'test3',
           name: 'Someone, Else',
+          team: 'Team B',
           rating: 2400,
         },
         white: {
           lichess: 'test5',
           name: 'Trevlar, Someone',
+          team: 'Team C',
           rating: 0,
         },
         reversed: true,
@@ -83,11 +87,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'test6',
           name: 'TestPlayer, Mary',
+          team: 'Team C',
           rating: 1600,
         },
         white: {
           lichess: 'test1',
           name: 'Another, Test',
+          team: 'Team B',
           rating: 1900,
         },
         reversed: false,
@@ -97,11 +103,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'test2',
           name: 'Ignore, This',
+          team: 'Team B',
           rating: 1400,
         },
         white: {
           lichess: 'test7',
           name: 'Testing, Tester',
+          team: 'Team C',
           rating: 0,
         },
         reversed: true,
@@ -111,11 +119,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'TestAccount1',
           name: 'SomeoneElse, Michael',
+          team: 'Team D',
           rating: 2230,
         },
         white: {
           lichess: 'Cynosure',
           name: 'Wait, Theophilus',
+          team: 'Team A',
           rating: 0,
         },
         reversed: false,
@@ -125,11 +135,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'Thibault',
           name: 'Thibault, D',
+          team: 'Team A',
           rating: 0,
         },
         white: {
           lichess: 'TestAccount2',
           name: 'YetSomeoneElse, Lilly',
+          team: 'Team D',
           rating: 2070,
         },
         reversed: true,
@@ -139,11 +151,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'TestAccount3',
           name: 'Unknown, Player',
+          team: 'Team D',
           rating: 1300,
         },
         white: {
           lichess: 'Puzzlingpuzzler',
           name: 'Gkizi, Konst',
+          team: 'Team A',
           rating: 1270,
         },
         reversed: false,
@@ -153,11 +167,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'ThisAccountDoesntExist',
           name: 'Placeholder, Player',
+          team: 'Team A',
           rating: 0,
         },
         white: {
           lichess: 'TestAccount4',
           name: 'Also, Unknown',
+          team: 'Team D',
           rating: 1111,
         },
         reversed: true,
@@ -175,11 +191,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'ttrv',
           name: 'ttrvraw, ttrvdae',
+          team: 'Team 3',
           rating: 0,
         },
         white: {
           lichess: 'cynosure',
           name: 'cybosu, dsad',
+          team: 'Team 2',
           rating: 0,
         },
         reversed: false,
@@ -189,11 +207,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'e4',
           name: 'someonesalt, somealt',
+          team: 'Team 2',
           rating: 0,
         },
         white: {
           lichess: 'lovlas',
           name: 'lovlaswa, lovlasdw',
+          team: 'Team 3',
           rating: 2400,
         },
         reversed: true,
@@ -203,11 +223,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'carpentum',
           name: 'carpentumsaw, carpentumsad',
+          team: 'Team 4',
           rating: 0,
         },
         white: {
           lichess: 'thibault',
           name: 'thibault1, test1',
+          team: 'Team 1',
           rating: 0,
         },
         reversed: false,
@@ -217,11 +239,13 @@ describe('fetch pairings', () => {
         black: {
           lichess: 'neio',
           name: 'neio123, neioe2qe',
+          team: 'Team 1',
           rating: 0,
         },
         white: {
           lichess: 'Puzzlingpuzzler',
           name: 'puzzlingpuzzlerpux, puzzler',
+          team: 'Team 4',
           rating: 0,
         },
         reversed: true,
@@ -237,11 +261,13 @@ describe('fetch pairings', () => {
     expect(pairings[0]).toEqual({
       white: {
         name: 'Berend Elvira',
+        team: 'European Investment Bank',
         rating: 2326,
         lichess: undefined,
       },
       black: {
         name: 'Nepomniachtchi Ian',
+        team: 'SBER',
         rating: 2789,
         lichess: undefined,
       },
@@ -251,16 +277,36 @@ describe('fetch pairings', () => {
     expect(pairings[1]).toEqual({
       black: {
         name: 'Sebe-Vodislav Razvan-Alexandru',
+        team: 'European Investment Bank',
         rating: 2270,
         lichess: undefined,
       },
       white: {
         name: 'Kadatsky Alexander',
+        team: 'SBER',
         rating: 2368,
         lichess: undefined,
       },
       reversed: true,
       board: '1.2',
+    });
+
+    // check the next set of Teams
+    expect(pairings[8]).toEqual({
+      black: {
+        name: 'Delchev Alexander',
+        team: 'Tigar Tyres',
+        rating: 2526,
+        lichess: undefined,
+      },
+      white: {
+        name: 'Chernikova Iryna',
+        team: 'Airbus (FRA)',
+        rating: 1509,
+        lichess: undefined,
+      },
+      reversed: false,
+      board: '3.1',
     });
   });
 
@@ -287,11 +333,13 @@ describe('fetch pairings', () => {
     expect(pairings[0]).toEqual({
       white: {
         name: 'ANotehrnotTest, wadfaeefa',
+        team: 'Team 4',
         lichess: 'Testacct31',
         rating: 2100,
       },
       black: {
         name: 'Teambtest, sadsaf',
+        team: 'Team 2',
         lichess: 'Testacct11',
         rating: 0,
       },
@@ -301,11 +349,13 @@ describe('fetch pairings', () => {
     expect(pairings[1]).toEqual({
       white: {
         name: 'Teamseers, Steasdea',
+        team: 'Team 2',
         lichess: 'Testacct12',
         rating: 1670,
       },
       black: {
         name: 'czxzszcsszc, zxcszczs',
+        team: 'Team 4',
         lichess: 'Testacct33',
         rating: 0,
       },
