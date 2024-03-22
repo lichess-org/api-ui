@@ -369,7 +369,7 @@ export class BulkShow {
   private lichessLink = (path: string, text?: string) => {
     const href = `${this.lichessUrl}/${path}`;
     return h('a', { attrs: { target: '_blank', href } }, text || href);
-  }
+  };
 
   private loadNamesFromChessResults = async (
     pairingsInput: HTMLInputElement,
