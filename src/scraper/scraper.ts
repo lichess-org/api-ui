@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 
 export interface Player {
   name: string;
+  team?: string;
   fideId?: string;
   rating?: number;
   lichess?: string;
@@ -101,7 +102,19 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
     .map((_index, element) => $(element).text().trim())
     .get();
 
+  let teams: string[] = [];
+
   $('.CRs1 tr').each((_index, element) => {
+    // find the header rows that include the team names
+    if ($(element).hasClass('CRg1b') && $(element).find('th').length > 0) {
+      teams = $(element)
+        .find('th')
+        .filter((_index, element) => $(element).text().includes('\u00a0\u00a0'))
+        .map((_index, element) => $(element).text().trim())
+        .get();
+      return;
+    }
+
     // ignore rows that do not have pairings
     if ($(element).find('table').length === 0) {
       return;
@@ -132,11 +145,13 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
       pairings.push({
         white: {
           name: white,
+          team: teams[0],
           rating: rating1,
           lichess: username1,
         },
         black: {
           name: black,
+          team: teams[1],
           rating: rating2,
           lichess: username2,
         },
@@ -147,11 +162,13 @@ function parsePairingsForTeamSwiss(html: string): Pairing[] {
       pairings.push({
         white: {
           name: white,
+          team: teams[1],
           rating: rating2,
           lichess: username2,
         },
         black: {
           name: black,
+          team: teams[0],
           rating: rating1,
           lichess: username1,
         },

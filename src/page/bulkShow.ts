@@ -283,7 +283,7 @@ export class BulkShow {
           'tbody',
           this.games.map(g =>
             h('tr', { key: g.id }, [
-              h('td.mono.col-2', this.lichessLink(g.id, `#${g.id}`)),
+              h('td.mono', this.lichessLink(g.id, `#${g.id}`)),
               h('td', playerLink(g.players.white)),
               h('td', g.fullNames.white),
               h('td', playerLink(g.players.black)),
@@ -307,6 +307,8 @@ export class BulkShow {
       board: string;
       name1: string;
       name2: string;
+      team1?: string;
+      team2?: string;
       result?: string;
       reversed: boolean;
     }[] = this.crPairings.map(pairing => {
@@ -322,6 +324,8 @@ export class BulkShow {
           board: pairing.board,
           name1: pairing.white.name,
           name2: pairing.black.name,
+          team1: pairing.white.team,
+          team2: pairing.black.team,
           result: game?.result,
           reversed: pairing.reversed,
         };
@@ -331,6 +335,8 @@ export class BulkShow {
           board: pairing.board,
           name1: pairing.black.name,
           name2: pairing.white.name,
+          team1: pairing.black.team,
+          team2: pairing.white.team,
           result: game?.result.split('').reverse().join(''),
           reversed: pairing.reversed,
         };
@@ -344,13 +350,15 @@ export class BulkShow {
           'tbody',
           results.map(result =>
             h('tr', { key: result.name1 }, [
-              h('td.mono.col-2', result.gameId ? this.lichessLink(result.gameId, `#${result.gameId}`) : null),
+              h('td.mono', result.gameId ? this.lichessLink(result.gameId) : null),
               h('td.mono', result.board),
+              h('td', result.team1),
               h('td', result.reversed ? '' : 'w'),
               h('td', result.name1),
               h('td.mono.text-center.table-secondary', result.result),
               h('td', result.reversed ? 'w' : ''),
               h('td', result.name2),
+              h('td', result.team2),
             ]),
           ),
         ),
@@ -358,8 +366,10 @@ export class BulkShow {
     ]);
   };
 
-  private lichessLink = (path: string, text: string) =>
-    h('a', { attrs: { target: '_blank', href: `${this.lichessUrl}/${path}` } }, text);
+  private lichessLink = (path: string, text?: string) => {
+    const href = `${this.lichessUrl}/${path}`;
+    return h('a', { attrs: { target: '_blank', href } }, text || href);
+  }
 
   private loadNamesFromChessResults = async (
     pairingsInput: HTMLInputElement,
