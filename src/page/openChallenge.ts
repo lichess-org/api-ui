@@ -12,7 +12,6 @@ interface Result {
   open: {
     userIds?: [string, string];
   };
-
   urlWhite: string;
   urlBlack: string;
 }
