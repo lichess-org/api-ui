@@ -7,12 +7,10 @@ import layout from '../view/layout';
 import { card, copyInput } from '../view/util';
 
 interface Result {
-  challenge: {
-    id: string;
-    url: string;
-    open: {
-      userIds?: [string, string];
-    };
+  id: string;
+  url: string;
+  open: {
+    userIds?: [string, string];
   };
   urlWhite: string;
   urlBlack: string;
@@ -89,7 +87,7 @@ export class OpenChallenge {
     ]);
 
   private renderResult = (result: Result) => {
-    const c = result.challenge;
+    const c = result;
     return card(
       c.id,
       ['Challenge #', c.id],
