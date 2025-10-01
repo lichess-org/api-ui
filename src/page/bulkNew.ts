@@ -1,12 +1,12 @@
 import { h } from 'snabbdom';
 import page from 'page';
 import { App } from '../app';
-import { Me } from '../auth';
-import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
+import type { Me } from '../auth';
+import { type Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
-import { Pairing, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
+import { type Pairing, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
 import { bulkPairing } from '../endpoints';
 import { href } from '../view/util';
 
@@ -26,12 +26,11 @@ interface Result {
 
 export class BulkNew {
   feedback: Feedback<Result> = undefined;
-  lichessUrl: string;
-  constructor(
-    readonly app: App,
-    readonly me: Me,
-  ) {
-    this.lichessUrl = app.config.lichessHost;
+  readonly app: App;
+  readonly me: Me;
+  constructor(app: App, me: Me) {
+    this.app = app;
+    this.me = me;
   }
   redraw = () => this.app.redraw(this.render());
   render = () =>
@@ -94,7 +93,7 @@ export class BulkNew {
             .sort(sortFn) as [string, string],
       );
       const rules = gameRuleKeys.filter(key => !!get(key));
-      const req = this.me.httpClient(`${this.lichessUrl}/api/bulk-pairing`, {
+      const req = this.me.httpClient(`${this.app.config.lichessHost}/api/bulk-pairing`, {
         method: 'POST',
         body: formData({
           players: pairingTokens.map(([white, black]) => `${white}:${black}`).join(','),
@@ -126,7 +125,7 @@ export class BulkNew {
   };
 
   private adminChallengeTokens = async (users: string[]): Promise<Tokens> => {
-    const res = await this.me.httpClient(`${this.lichessUrl}/api/token/admin-challenge`, {
+    const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/token/admin-challenge`, {
       method: 'POST',
       body: formData({
         users: users.join(','),
@@ -264,7 +263,7 @@ export class BulkNew {
 
     const chunkSize = 300;
     for (let i = 0; i < usernames.length; i += chunkSize) {
-      const res = await this.me.httpClient(`${this.lichessUrl}/api/users`, {
+      const res = await this.me.httpClient(`${this.app.config.lichessHost}/api/users`, {
         method: 'POST',
         body: usernames.slice(i, i + chunkSize).join(', '),
         headers: {

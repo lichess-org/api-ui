@@ -10,8 +10,14 @@ Some web UIs for [the Lichess API](https://lichess.org/api)
 
 ```bash
 pnpm install
-pnpm build # or pnpm watch
-pnpm serve
+pnpm dev
+```
+
+### Build for production + preview
+
+```bash
+pnpm build
+pnpm preview
 ```
 
 ## Tests

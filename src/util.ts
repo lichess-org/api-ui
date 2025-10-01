@@ -1,4 +1,4 @@
-import { Rule } from './model';
+import type { Rule } from './model';
 
 export const BASE_PATH = location.pathname.replace(/\/$/, '');
 

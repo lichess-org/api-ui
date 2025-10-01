@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import { Auth } from './auth';
-import { Redraw } from './interfaces';
+import type { Redraw } from './interfaces';
 import layout from './view/layout';
 
 export interface Config {
@@ -9,11 +9,12 @@ export interface Config {
 
 export class App {
   auth: Auth;
+  config: Config;
+  redraw: Redraw;
 
-  constructor(
-    readonly config: Config,
-    readonly redraw: Redraw,
-  ) {
+  constructor(config: Config, redraw: Redraw) {
+    this.config = config;
+    this.redraw = redraw;
     this.auth = new Auth(config.lichessHost);
   }
 

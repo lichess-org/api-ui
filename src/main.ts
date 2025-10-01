@@ -1,17 +1,16 @@
-import { init, attributesModule, eventListenersModule, classModule, VNode } from 'snabbdom';
+import { init, attributesModule, eventListenersModule, classModule, type VNode } from 'snabbdom';
 import { loadingBody } from './view/util';
-import '../scss/_bootstrap.scss';
 import '../scss/style.scss';
-import '../node_modules/bootstrap/js/dist/dropdown.js';
-import '../node_modules/bootstrap/js/dist/collapse.js';
+import 'bootstrap/js/dist/dropdown.js';
+import 'bootstrap/js/dist/collapse.js';
 import routing from './routing';
-import { App, Config } from './app';
+import { App, type Config } from './app';
 
 const config: Config = {
   lichessHost: localStorage.getItem('lichessHost') || 'https://lichess.org',
 };
 
-export default async function (element: HTMLElement) {
+async function attach (element: HTMLDivElement) {
   const patch = init([attributesModule, eventListenersModule, classModule]);
 
   const app = new App(config, redraw);
@@ -25,3 +24,5 @@ export default async function (element: HTMLElement) {
   await app.auth.init();
   routing(app);
 }
+
+attach(document.querySelector<HTMLDivElement>('#app')!)

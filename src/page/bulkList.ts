@@ -1,21 +1,20 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Me } from '../auth';
+import type { Me } from '../auth';
 import layout from '../view/layout';
 import { href, timeFormat, url } from '../view/util';
-import { Bulk } from '../model';
+import type { Bulk } from '../model';
 import { bulkPairing } from '../endpoints';
 import { BulkShow } from './bulkShow';
 import { ucfirst } from '../util';
 
 export class BulkList {
-  lichessUrl: string;
   bulks?: Bulk[];
-  constructor(
-    readonly app: App,
-    readonly me: Me,
-  ) {
-    this.lichessUrl = app.config.lichessHost;
+  readonly app: App;
+  readonly me: Me;
+  constructor(app: App, me: Me) {
+    this.app = app;
+    this.me = me;
     this.loadBulks();
   }
   loadBulks = async () => {

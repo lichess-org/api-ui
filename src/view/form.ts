@@ -1,9 +1,9 @@
 import { h } from 'snabbdom';
 import { variants } from '../util';
-import { MaybeVNodes } from '../interfaces';
-import { Failure, Feedback, isFailure } from '../form';
-import { Rule } from '../model';
-import { SavedPlayerUrls } from '../scraper/scraper';
+import type { MaybeVNodes } from '../interfaces';
+import { type Failure, type Feedback, isFailure } from '../form';
+import type { Rule } from '../model';
+import type { SavedPlayerUrls } from '../scraper/scraper';
 
 export interface Input {
   tpe: string;

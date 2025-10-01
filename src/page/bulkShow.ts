@@ -1,14 +1,14 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Me } from '../auth';
+import type { Me } from '../auth';
 import layout from '../view/layout';
 import { href, timeFormat } from '../view/util';
-import { Bulk, BulkId, Game, Player, Username } from '../model';
-import { Stream, readStream } from '../ndJsonStream';
+import type { Bulk, BulkId, Game, Player, Username } from '../model';
+import { type Stream, readStream } from '../ndJsonStream';
 import { bulkPairing } from '../endpoints';
 import { sleep, ucfirst } from '../util';
 import { loadPlayersFromUrl } from '../view/form';
-import { Pairing, getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
+import { type Pairing, getPairings, getPlayers, getUrls, saveUrls } from '../scraper/scraper';
 
 type Result = '*' | '1-0' | '0-1' | '½-½' | '+--' | '--+';
 interface FormattedGame {
@@ -20,19 +20,19 @@ interface FormattedGame {
 }
 
 export class BulkShow {
-  lichessUrl: string;
   bulk?: Bulk;
   games: FormattedGame[] = [];
   gameStream?: Stream;
   liveUpdate = true;
   fullNames = new Map<Username, string>();
   crPairings: Pairing[] = [];
-  constructor(
-    readonly app: App,
-    readonly me: Me,
-    readonly id: BulkId,
-  ) {
-    this.lichessUrl = app.config.lichessHost;
+  readonly app: App;
+  readonly me: Me;
+  readonly id: BulkId;
+  constructor(app: App, me: Me, id: BulkId) {
+    this.app = app;
+    this.me = me;
+    this.id = id;
     this.loadBulk().then(() => this.loadGames());
   }
   loadBulk = async () => {
@@ -367,7 +367,7 @@ export class BulkShow {
   };
 
   private lichessLink = (path: string, text?: string) => {
-    const href = `${this.lichessUrl}/${path}`;
+    const href = `${this.app.config.lichessHost}/${path}`;
     return h('a', { attrs: { target: '_blank', href } }, text || href);
   };
 

@@ -1,10 +1,10 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Feedback, isSuccess, responseToFeedback } from '../form';
+import { type Feedback, isSuccess, responseToFeedback } from '../form';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { card, copyInput } from '../view/util';
-import { Me } from '../auth';
+import type { Me } from '../auth';
 
 interface Result {
   id: string;
@@ -13,10 +13,12 @@ interface Result {
 
 export class PuzzleRace {
   feedback: Feedback<Result> = undefined;
-  constructor(
-    readonly app: App,
-    readonly me: Me,
-  ) {}
+  readonly app: App;
+  readonly me: Me;
+  constructor(app: App, me: Me) {
+    this.app = app;
+    this.me = me;
+  }
   redraw = () => this.app.redraw(this.render());
   render = () =>
     layout(

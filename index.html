@@ -8,15 +8,12 @@
       content="connect-src 'self' l.org localhost:8080 lichess.org lichess.dev corsproxy.io;"
     />
 
-    <link href="style.css" rel="stylesheet" />
-    <link rel="icon" type="image/x-icon" href="dist/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
     <title>Lichess API UI</title>
   </head>
   <body>
-    <script src="index.js"></script>
-    <script>
-      LichessApiUI(document.body);
-    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import { h } from 'snabbdom';
-import { MaybeVNodes } from '../interfaces';
+import type { MaybeVNodes } from '../interfaces';
 import { BASE_PATH } from '../util';
 
 export const loadingBody = () => h('div.loading', spinner());

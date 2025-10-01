@@ -1,7 +1,7 @@
-import { h, VNode } from 'snabbdom';
-import { Me } from '../auth';
+import { h, type VNode } from 'snabbdom';
+import type { Me } from '../auth';
 import { App } from '../app';
-import { MaybeVNodes } from '../interfaces';
+import { type MaybeVNodes } from '../interfaces';
 import { endpoints } from '../endpoints';
 import { href } from './util';
 

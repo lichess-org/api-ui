@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import { App } from '../app';
-import { Feedback, formData, isSuccess, responseToFeedback } from '../form';
+import { type Feedback, formData, isSuccess, responseToFeedback } from '../form';
 import { gameRuleKeysExceptNoAbort, gameRulesExceptNoAbort } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
@@ -18,7 +18,10 @@ interface Result {
 
 export class OpenChallenge {
   feedback: Feedback<Result> = undefined;
-  constructor(readonly app: App) {}
+  readonly app: App;
+  constructor(app: App) {
+    this.app = app;
+  }
   redraw = () => this.app.redraw(this.render());
   render = () =>
     layout(

@@ -5,7 +5,10 @@ import { endpoints } from '../endpoints';
 import { href } from '../view/util';
 
 export class Home {
-  constructor(readonly app: App) {}
+  readonly app: App;
+  constructor(app: App) {
+    this.app = app;
+  }
 
   render = () => layout(this.app, h('div.app-home', [this.renderAbout(), this.listEndpoints()]));
   redraw = () => this.app.redraw(this.render());

@@ -1,10 +1,10 @@
-import { describe, expect, test, vi, Mock, beforeEach } from 'vitest';
+import { describe, expect, test, vi, type Mock, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
 import {
   getPlayers,
   getPairings,
   setResultsPerPage,
-  Player,
+  type Player,
   getUrls,
   saveUrls,
   setCacheBuster,
