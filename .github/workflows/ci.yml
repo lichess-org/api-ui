@@ -15,8 +15,6 @@ jobs:
           - tsc
           - check-format
           - build
-    env:
-      ASSET_PATH: /api/ui/
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
