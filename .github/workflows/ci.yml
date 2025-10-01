@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        script:
+          - test
+          - tsc
+          - check-format
+    defaults:
+      run:
+        working-directory: doc
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+      - run: pnpm ${{ matrix.script }}

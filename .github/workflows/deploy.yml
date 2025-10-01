@@ -21,9 +21,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: npm install -g pnpm
-      - run: pnpm install
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
       - run: pnpm run prod
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
