@@ -196,13 +196,13 @@ function parsePairingsForIndividualEvent(html: string, players?: Player[]): Pair
 
   $('.CRs1 tr').each((_index, element) => {
     // ignore certain table headings: rows with less than 2 <td>'s
-    if ($(element).find('td').length < 2) {
+    if ($(element).find('td').length <= 2) {
       return;
     }
 
     const boardNumber = $(element).children().eq(0).text().trim();
-    const whiteName = $(element).children().eq(headers.indexOf('Name')).text().trim();
-    const blackName = $(element).children().eq(headers.lastIndexOf('Name')).text().trim();
+    const whiteName = $(element).children().eq(headers.indexOf('White')).text().trim();
+    const blackName = $(element).children().eq(headers.lastIndexOf('Black')).text().trim();
 
     pairings.push({
       white: players?.find(player => player.name === whiteName) ?? { name: whiteName },
