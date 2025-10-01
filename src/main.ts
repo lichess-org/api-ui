@@ -10,7 +10,7 @@ const config: Config = {
   lichessHost: localStorage.getItem('lichessHost') || 'https://lichess.org',
 };
 
-async function attach (element: HTMLDivElement) {
+async function attach(element: HTMLDivElement) {
   const patch = init([attributesModule, eventListenersModule, classModule]);
 
   const app = new App(config, redraw);
@@ -25,4 +25,4 @@ async function attach (element: HTMLDivElement) {
   routing(app);
 }
 
-attach(document.querySelector<HTMLDivElement>('#app')!)
+attach(document.querySelector<HTMLDivElement>('#app')!);
