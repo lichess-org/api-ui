@@ -14,9 +14,6 @@ jobs:
           - test
           - tsc
           - check-format
-    defaults:
-      run:
-        working-directory: doc
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
