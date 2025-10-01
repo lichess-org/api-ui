@@ -16,12 +16,11 @@ export interface Me {
 export class Auth {
   me?: Me;
   readonly lichessHost: string;
+  readonly oauth: OAuth2AuthCodePKCE;
   constructor(lichessHost: string) {
     this.lichessHost = lichessHost;
-  }
 
-  private oauth = () =>
-    new OAuth2AuthCodePKCE({
+    this.oauth = new OAuth2AuthCodePKCE({
       authorizationUrl: `${this.lichessHost}/oauth`,
       tokenUrl: `${this.lichessHost}/api/token`,
       clientId,
@@ -30,17 +29,18 @@ export class Auth {
       onAccessTokenExpiry: refreshAccessToken => refreshAccessToken(),
       onInvalidGrant: console.warn,
     });
+  }
 
   async init() {
     try {
-      const accessContext = await this.oauth().getAccessToken();
+      const accessContext = await this.oauth.getAccessToken();
       if (accessContext) await this.authenticate();
     } catch (err) {
       console.error(err);
     }
     if (!this.me) {
       try {
-        const hasAuthCode = await this.oauth().isReturningFromAuthServer();
+        const hasAuthCode = await this.oauth.isReturningFromAuthServer();
         if (hasAuthCode) await this.authenticate();
       } catch (err) {
         console.error(err);
@@ -49,7 +49,7 @@ export class Auth {
   }
 
   async login() {
-    await this.oauth().fetchAuthorizationCode();
+    await this.oauth.fetchAuthorizationCode();
   }
 
   async logout() {
@@ -59,7 +59,7 @@ export class Auth {
   }
 
   private authenticate = async () => {
-    const httpClient = this.oauth().decorateFetchHTTPClient(window.fetch);
+    const httpClient = this.oauth.decorateFetchHTTPClient(window.fetch);
     const res = await httpClient(`${this.lichessHost}/api/account`);
     if (res.status == 429) {
       location.href = clientUrl + '#!/too-many-requests';
