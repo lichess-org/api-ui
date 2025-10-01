@@ -14,17 +14,22 @@ export interface Me {
 }
 
 export class Auth {
-  constructor(readonly lichessHost: string) {}
-  oauth = new OAuth2AuthCodePKCE({
-    authorizationUrl: `${this.lichessHost}/oauth`,
-    tokenUrl: `${this.lichessHost}/api/token`,
-    clientId,
-    scopes,
-    redirectUrl: clientUrl,
-    onAccessTokenExpiry: refreshAccessToken => refreshAccessToken(),
-    onInvalidGrant: console.warn,
-  });
   me?: Me;
+  readonly lichessHost: string;
+  readonly oauth: OAuth2AuthCodePKCE;
+  constructor(lichessHost: string) {
+    this.lichessHost = lichessHost;
+
+    this.oauth = new OAuth2AuthCodePKCE({
+      authorizationUrl: `${this.lichessHost}/oauth`,
+      tokenUrl: `${this.lichessHost}/api/token`,
+      clientId,
+      scopes,
+      redirectUrl: clientUrl,
+      onAccessTokenExpiry: refreshAccessToken => refreshAccessToken(),
+      onInvalidGrant: console.warn,
+    });
+  }
 
   async init() {
     try {

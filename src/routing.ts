@@ -5,7 +5,7 @@ import { BulkNew } from './page/bulkNew';
 import { OpenChallenge } from './page/openChallenge';
 import { PuzzleRace } from './page/puzzleRace';
 import { BulkList } from './page/bulkList';
-import { Me } from './auth';
+import type { Me } from './auth';
 import { BulkShow } from './page/bulkShow';
 import { BASE_PATH } from './util';
 

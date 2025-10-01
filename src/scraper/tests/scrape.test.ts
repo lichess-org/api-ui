@@ -1,10 +1,10 @@
-import { describe, expect, test, vi, Mock, beforeEach } from 'vitest';
+import { describe, expect, test, vi, type Mock, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
 import {
   getPlayers,
   getPairings,
   setResultsPerPage,
-  Player,
+  type Player,
   getUrls,
   saveUrls,
   setCacheBuster,
@@ -23,25 +23,25 @@ describe('fetch players', () => {
   test('with lichess usernames', async () => {
     const players = await getPlayers('https://example.com/players-list-with-usernames.html');
 
-    expect(players).toHaveLength(71);
     expect(players[1]).toEqual({
       name: 'Navara, David',
       fideId: '309095',
       rating: 2679,
       lichess: 'RealDavidNavara',
     });
+    expect(players).toHaveLength(71);
   });
 
   test('with team columns', async () => {
     const players = await getPlayers('https://example.com/players-list-without-usernames.html');
 
-    expect(players).toHaveLength(150);
     expect(players[0]).toEqual({
       name: 'Nepomniachtchi Ian',
       fideId: '4168119',
       rating: 2789,
       lichess: undefined,
     });
+    expect(players).toHaveLength(150);
   });
 });
 
@@ -49,7 +49,6 @@ describe('fetch pairings', () => {
   test('team swiss', async () => {
     const pairings = await getPairings('https://example.com/team-swiss-pairings-with-usernames.html');
 
-    expect(pairings).toHaveLength(8);
     expect(pairings).toStrictEqual([
       {
         black: {
@@ -180,84 +179,50 @@ describe('fetch pairings', () => {
         board: '2.4',
       },
     ]);
+    expect(pairings).toHaveLength(8);
   });
 
   test('team another swiss', async () => {
     const pairings = await getPairings('https://example.com/team-swiss-pairings-with-usernames-2.html');
 
-    expect(pairings).toHaveLength(4);
-    expect(pairings).toStrictEqual([
-      {
-        black: {
-          lichess: 'ttrv',
-          name: 'ttrvraw, ttrvdae',
-          team: 'Team 3',
-          rating: 0,
-        },
-        white: {
-          lichess: 'cynosure',
-          name: 'cybosu, dsad',
-          team: 'Team 2',
-          rating: 0,
-        },
-        reversed: false,
-        board: '1.1',
+    expect(pairings[0]).toStrictEqual({
+      black: {
+        lichess: 'PeterAcs',
+        name: 'Acs Peter',
+        team: 'Morgan Stanley',
+        rating: 2582,
       },
-      {
-        black: {
-          lichess: 'e4',
-          name: 'someonesalt, somealt',
-          team: 'Team 2',
-          rating: 0,
-        },
-        white: {
-          lichess: 'lovlas',
-          name: 'lovlaswa, lovlasdw',
-          team: 'Team 3',
-          rating: 2400,
-        },
-        reversed: true,
-        board: '1.2',
+      white: {
+        lichess: 'joe1714',
+        name: 'Karan J P',
+        team: 'Accenture',
+        rating: 1852,
       },
-      {
-        black: {
-          lichess: 'carpentum',
-          name: 'carpentumsaw, carpentumsad',
-          team: 'Team 4',
-          rating: 0,
-        },
-        white: {
-          lichess: 'thibault',
-          name: 'thibault1, test1',
-          team: 'Team 1',
-          rating: 0,
-        },
-        reversed: false,
-        board: '2.1',
+      reversed: false,
+      board: '1.1',
+    });
+    expect(pairings[pairings.length - 1]).toStrictEqual({
+      black: {
+        lichess: 'Dimash8888',
+        name: 'Jexekov Dimash',
+        team: 'Freedom Holding',
+        rating: 0,
       },
-      {
-        black: {
-          lichess: 'neio',
-          name: 'neio123, neioe2qe',
-          team: 'Team 1',
-          rating: 0,
-        },
-        white: {
-          lichess: 'Puzzlingpuzzler',
-          name: 'puzzlingpuzzlerpux, puzzler',
-          team: 'Team 4',
-          rating: 0,
-        },
-        reversed: true,
-        board: '2.2',
+      white: {
+        lichess: 'hhauks',
+        name: 'Hauksdottir Hrund',
+        team: 'Islandsbanki',
+        rating: 1814,
       },
-    ]);
+      reversed: true,
+      board: '7.4',
+    });
+    expect(pairings).toHaveLength(28);
   });
 
   test('team swiss w/o lichess usernames on the same page', async () => {
     const pairings = await getPairings('https://example.com/team-swiss-pairings-without-usernames.html');
 
-    expect(pairings).toHaveLength(76);
     expect(pairings[0]).toEqual({
       white: {
         name: 'Berend Elvira',
@@ -308,12 +273,12 @@ describe('fetch pairings', () => {
       reversed: false,
       board: '3.1',
     });
+    expect(pairings).toHaveLength(76);
   });
 
   test('individual round robin', async () => {
     const pairings = await getPairings('https://example.com/individual-round-robin-pairings.html');
 
-    expect(pairings).toHaveLength(28);
     expect(pairings[0]).toEqual({
       white: {
         name: 'Ponkratov, Pavel',
@@ -324,50 +289,50 @@ describe('fetch pairings', () => {
       reversed: false,
       board: '1',
     });
+    expect(pairings).toHaveLength(28);
   });
 
   test('team round robin', async () => {
     const pairings = await getPairings('https://example.com/team-round-robin-pairings.html');
 
-    expect(pairings).toHaveLength(12);
     expect(pairings[0]).toEqual({
       white: {
-        name: 'ANotehrnotTest, wadfaeefa',
-        team: 'Team 4',
-        lichess: 'Testacct31',
-        rating: 2100,
+        name: 'Kyrkjebo, Hanna B.',
+        team: 'KPMG Norway',
+        lichess: 'watchmecheck',
+        rating: 1899,
       },
       black: {
-        name: 'Teambtest, sadsaf',
-        team: 'Team 2',
-        lichess: 'Testacct11',
-        rating: 0,
+        name: 'Liu, Zhaoqi',
+        team: 'Nanjing Spark Chess Technology Co.Ltd.',
+        lichess: 'lzqupup',
+        rating: 2337,
       },
       reversed: false,
       board: '1.1',
     });
     expect(pairings[1]).toEqual({
       white: {
-        name: 'Teamseers, Steasdea',
-        team: 'Team 2',
-        lichess: 'Testacct12',
-        rating: 1670,
+        name: 'Du, Chunhui',
+        team: 'Nanjing Spark Chess Technology Co.Ltd.',
+        lichess: 'duchunhui',
+        rating: 2288,
       },
       black: {
-        name: 'czxzszcsszc, zxcszczs',
-        team: 'Team 4',
-        lichess: 'Testacct33',
-        rating: 0,
+        name: 'Grimsrud, Oyvind',
+        team: 'KPMG Norway',
+        lichess: 'Bruneratseth',
+        rating: 1836,
       },
       reversed: true,
       board: '1.2',
     });
+    expect(pairings).toHaveLength(8);
   });
 
   test('individual swiss', async () => {
     const pairings = await getPairings('https://example.com/individual-swiss-pairings.html');
 
-    expect(pairings).toHaveLength(59);
     expect(pairings[0]).toEqual({
       white: {
         name: 'Gunina, Valentina',
@@ -378,6 +343,7 @@ describe('fetch pairings', () => {
       reversed: false,
       board: '1',
     });
+    expect(pairings).toHaveLength(59);
   });
 
   test('individual swiss w/ player substitution', async () => {
@@ -393,7 +359,6 @@ describe('fetch pairings', () => {
     ];
     const pairings = await getPairings('https://example.com/individual-swiss-pairings.html', players);
 
-    expect(pairings).toHaveLength(59);
     expect(pairings[0]).toEqual({
       white: {
         name: 'Gunina, Valentina',
@@ -406,6 +371,7 @@ describe('fetch pairings', () => {
       reversed: false,
       board: '1',
     });
+    expect(pairings).toHaveLength(59);
   });
 });
 

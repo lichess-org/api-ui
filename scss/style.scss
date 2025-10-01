@@ -1,5 +1,5 @@
-@import './bootstrap';
-@import './navbar';
+@use './bootstrap';
+@use './navbar';
 
 body > .container {
   min-height: 60vh;
