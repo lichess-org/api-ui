@@ -4,28 +4,27 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "~2.13.0",
-    "bootstrap": "~5.3.3",
-    "cheerio": "1.0.0-rc.12",
+    "bootstrap": "~5.3.8",
+    "cheerio": "^1.1.2",
     "page": "~1.11.6",
-    "snabbdom": "~3.6.2"
+    "snabbdom": "~3.6.3"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "15.2.3",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@types/cheerio": "^0.22.35",
-    "@types/node": "^20.11.30",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^24.6.1",
     "@types/page": "^1.11.9",
     "http-server": "^14.1.1",
-    "jsdom": "^24.0.0",
-    "prettier": "^3.2.5",
-    "rollup": "^4.13.0",
-    "rollup-plugin-scss": "~4.0.0",
-    "sass": "^1.72.0",
-    "tslib": "~2.6.2",
-    "typescript": "^5.4.3",
-    "vitest": "^1.4.0"
+    "jsdom": "^27.0.0",
+    "prettier": "^3.6.2",
+    "rollup": "^4.52.3",
+    "rollup-plugin-scss": "~4.0.1",
+    "sass": "^1.93.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "build": "rollup --config",
@@ -33,8 +32,10 @@
     "prod": "rollup --config --config-prod",
     "serve": "http-server",
     "format": "prettier --write .",
+    "check-format": "prettier --check .",
     "tsc": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
-  }
+  },
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }
