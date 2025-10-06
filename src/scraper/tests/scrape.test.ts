@@ -373,6 +373,80 @@ describe('fetch pairings', () => {
     });
     expect(pairings).toHaveLength(59);
   });
+
+  test('team ko pairings w/o usernames', async () => {
+    const pairings = await getPairings('https://example.com/team-ko-pairings-without-usernames.html');
+
+    expect(pairings[0]).toEqual({
+      white: {
+        name: 'Andriasian, Zaven',
+        rating: 2624,
+        team: 'Chessify',
+      },
+      black: {
+        name: 'Schneider, Igor',
+        rating: 2206,
+        team: 'Deutsche Bank',
+      },
+      reversed: false,
+      board: '1.1',
+    });
+
+    expect(pairings[pairings.length - 1]).toEqual({
+      white: {
+        name: 'van Eerde, Matthew',
+        rating: 0,
+        team: 'Microsoft E',
+      },
+      black: {
+        name: 'Asbjornsen, Oyvind Von Doren',
+        rating: 1594,
+        team: 'Von Doren Watch Company AS',
+      },
+      reversed: true,
+      board: '3.4',
+    });
+    expect(pairings).toHaveLength(24);
+  });
+
+  test('team ko pairings w/ usernames', async () => {
+    const pairings = await getPairings('https://example.com/team-ko-pairings-with-usernames.html');
+
+    expect(pairings[0]).toEqual({
+      white: {
+        name: 'T2, P1',
+        lichess: 't2pl1',
+        rating: 1678,
+        team: 'Team 2',
+      },
+      black: {
+        name: 'T4, P1',
+        lichess: 't4pl1',
+        rating: 0,
+        team: 'Team 4',
+      },
+      reversed: false,
+      board: '1.1',
+    });
+
+    expect(pairings[pairings.length - 1]).toEqual({
+      white: {
+        name: 'T3, P4',
+        lichess: 't3pl4',
+        rating: 0,
+        team: 'Team 3',
+      },
+      black: {
+        name: 'T1, P4',
+        lichess: 't1pl4',
+        rating: 2453,
+        team: 'Team 1',
+      },
+      reversed: true,
+      board: '2.4',
+    });
+    expect(pairings).toHaveLength(16);
+  });
 });
 
 test('set results per page', () => {
