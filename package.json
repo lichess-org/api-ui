@@ -16,8 +16,8 @@
     "sass": "^1.93.2",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
-    "vite": "^7.1.7"
+    "vite": "^7.1.9",
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "build": "tsc && vite build",

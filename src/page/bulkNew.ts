@@ -292,11 +292,30 @@ export class BulkNew {
 
       const players = playersUrl ? await getPlayers(playersUrl) : undefined;
       const pairings = await getPairings(pairingsUrl, players);
-      this.insertPairings(pairings);
+      this.insertPairings(this.selectRound(pairings));
     } catch (err) {
       alert(err);
     }
   };
+
+  private selectRound(pairings: Pairing[]) {
+    const numRounds = pairings.filter(p => p.board === '1.1').length;
+    if (numRounds > 1) {
+      const selectedRound = prompt(
+        `There are ${numRounds} rounds in this tournament. Which round do you want to load? (1-${numRounds}, or "all" for no filtering)`,
+      );
+      if (selectedRound === 'all') {
+        return pairings;
+      }
+      const roundNum = parseInt(selectedRound || '1');
+      if (isNaN(roundNum) || roundNum < 1 || roundNum > numRounds) {
+        throw new Error('Invalid round number');
+      }
+      const roundPrefix = `${roundNum}.`;
+      pairings = pairings.filter(p => p.board.startsWith(roundPrefix));
+    }
+    return pairings;
+  }
 
   private insertPairings(pairings: Pairing[]) {
     pairings.forEach(pairing => {
