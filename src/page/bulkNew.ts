@@ -311,8 +311,7 @@ export class BulkNew {
       if (isNaN(roundNum) || roundNum < 1 || roundNum > numRounds) {
         throw new Error('Invalid round number');
       }
-      const roundPrefix = `${roundNum}.`;
-      pairings = pairings.filter(p => p.board.startsWith(roundPrefix));
+      pairings = pairings.filter(p => p.board.startsWith(`${roundNum}.`));
     }
     return pairings;
   }
