@@ -238,3 +238,18 @@ export function getUrls(bulkPairingId: string): SavedPlayerUrls | undefined {
   const parsed: { [key: string]: SavedPlayerUrls } = JSON.parse(savedUrls);
   return parsed[bulkPairingId];
 }
+
+export function filterRound(pairings: Pairing[], round: number): Pairing[] {
+  const boardMap = new Map<string, number>();
+  const filtered: Pairing[] = [];
+
+  for (const pairing of pairings) {
+    const count = boardMap.get(pairing.board) ?? 0;
+    if (count === round - 1) {
+      filtered.push(pairing);
+    }
+    boardMap.set(pairing.board, count + 1);
+  }
+
+  return filtered;
+}

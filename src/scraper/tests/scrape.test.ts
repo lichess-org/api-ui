@@ -8,6 +8,8 @@ import {
   getUrls,
   saveUrls,
   setCacheBuster,
+  type Pairing,
+  filterRound,
 } from '../scraper';
 
 global.fetch = vi.fn(proxyUrl => {
@@ -446,6 +448,39 @@ describe('fetch pairings', () => {
       board: '2.4',
     });
     expect(pairings).toHaveLength(16);
+  });
+});
+
+describe('round filtering', () => {
+  const pairings: Pairing[] = [
+    // round 1
+    { board: '1.1', white: { name: 'w1' }, black: { name: 'b1' }, reversed: false },
+    { board: '1.2', white: { name: 'w2' }, black: { name: 'b2' }, reversed: false },
+    { board: '2.1', white: { name: 'w3' }, black: { name: 'b3' }, reversed: false },
+    { board: '2.2', white: { name: 'w4' }, black: { name: 'b4' }, reversed: false },
+    // round 2
+    { board: '1.1', white: { name: 'w5' }, black: { name: 'b5' }, reversed: false },
+    { board: '1.2', white: { name: 'w6' }, black: { name: 'b6' }, reversed: false },
+    { board: '2.1', white: { name: 'w7' }, black: { name: 'b7' }, reversed: false },
+    { board: '2.2', white: { name: 'w8' }, black: { name: 'b8' }, reversed: false },
+  ];
+
+  test('round 1', () => {
+    expect(filterRound(pairings, 1)).toEqual([
+      { board: '1.1', white: { name: 'w1' }, black: { name: 'b1' }, reversed: false },
+      { board: '1.2', white: { name: 'w2' }, black: { name: 'b2' }, reversed: false },
+      { board: '2.1', white: { name: 'w3' }, black: { name: 'b3' }, reversed: false },
+      { board: '2.2', white: { name: 'w4' }, black: { name: 'b4' }, reversed: false },
+    ]);
+  });
+
+  test('round 2', () => {
+    expect(filterRound(pairings, 2)).toEqual([
+      { board: '1.1', white: { name: 'w5' }, black: { name: 'b5' }, reversed: false },
+      { board: '1.2', white: { name: 'w6' }, black: { name: 'b6' }, reversed: false },
+      { board: '2.1', white: { name: 'w7' }, black: { name: 'b7' }, reversed: false },
+      { board: '2.2', white: { name: 'w8' }, black: { name: 'b8' }, reversed: false },
+    ]);
   });
 });
 
