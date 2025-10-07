@@ -304,10 +304,12 @@ export class BulkNew {
       const selectedRound = prompt(
         `There are ${numRounds} rounds in this tournament. Which round do you want to load? (1-${numRounds}, or "all" for no filtering)`,
       );
-      if (selectedRound === 'all') {
+      if (selectedRound === null) {
+        throw new Error('Invalid round number');
+      } else if (selectedRound === 'all') {
         return pairings;
       }
-      const roundNum = parseInt(selectedRound || '1');
+      const roundNum = parseInt(selectedRound);
       if (isNaN(roundNum) || roundNum < 1 || roundNum > numRounds) {
         throw new Error('Invalid round number');
       }
