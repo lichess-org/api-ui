@@ -6,7 +6,7 @@ import { type Feedback, formData, isSuccess, responseToFeedback } from '../form'
 import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
-import { type Pairing, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
+import { type Pairing, filterRound, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
 import { bulkPairing } from '../endpoints';
 import { href } from '../view/util';
 
@@ -313,7 +313,7 @@ export class BulkNew {
       if (isNaN(roundNum) || roundNum < 1 || roundNum > numRounds) {
         throw new Error('Invalid round number');
       }
-      pairings = pairings.filter(p => p.board.startsWith(`${roundNum}.`));
+      return filterRound(pairings, roundNum);
     }
     return pairings;
   }
