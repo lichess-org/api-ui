@@ -11,12 +11,18 @@ importers:
       '@bity/oauth2-auth-code-pkce':
         specifier: ~2.13.0
         version: 2.13.0
+      '@lichess-org/types':
+        specifier: ^2.0.86
+        version: 2.0.86
       bootstrap:
         specifier: ~5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       cheerio:
         specifier: ^1.1.2
         version: 1.1.2
+      openapi-fetch:
+        specifier: ^0.15.0
+        version: 0.15.0
       page:
         specifier: ~1.11.6
         version: 1.11.6
@@ -268,6 +274,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lichess-org/types@2.0.86':
+    resolution: {integrity: sha512-Mx1cMCUkao+QgAz0liuhNwoe89GHu35lKrtIF+c0htpRyu39am80E9uZGVZrJSWe1/Nn4M9Lws4qCU6lpKn/QQ==}
 
   '@parcel/watcher-android-arm64@2.5.1':
     resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
@@ -745,6 +754,12 @@ packages:
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
+  openapi-fetch@0.15.0:
+    resolution: {integrity: sha512-OjQUdi61WO4HYhr9+byCPMj0+bgste/LtSBEcV6FzDdONTs7x0fWn8/ndoYwzqCsKWIxEZwo4FN/TG1c1rI8IQ==}
+
+  openapi-typescript-helpers@0.0.15:
+    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
+
   page@1.11.6:
     resolution: {integrity: sha512-P6e2JfzkBrPeFCIPplLP7vDDiU84RUUZMrWdsH4ZBGJ8OosnwFkcUkBHp1DTIjuipLliw9yQn/ZJsXZvarsO+g==}
 
@@ -1173,6 +1188,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
     optional: true
+
+  '@lichess-org/types@2.0.86': {}
 
   '@parcel/watcher-android-arm64@2.5.1':
     optional: true
@@ -1644,6 +1661,12 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
+
+  openapi-fetch@0.15.0:
+    dependencies:
+      openapi-typescript-helpers: 0.0.15
+
+  openapi-typescript-helpers@0.0.15: {}
 
   page@1.11.6:
     dependencies:

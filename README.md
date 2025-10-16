@@ -42,8 +42,12 @@ Open the browser console and run:
 
 ```js
 localStorage.setItem('lichessHost', 'http://localhost:8080');
+
+localStorage.setItem('lichessHost', 'https://lichess.dev');
 ```
 
-Modify the CSP meta tag in `index.html` to add that domain. For example, change `lichess.org` to `localhost:8080`.
+Modify the CSP meta tag in `index.html` to include that domain.
 
 Refresh and verify the configuration value in the footer.
+
+To reset back to prod default, log out and it will clear localStorage.

@@ -3,12 +3,14 @@ import page from 'page';
 import { App } from '../app';
 import type { Me } from '../auth';
 import { type Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRuleKeys, gameRules } from '../util';
+import { gameRuleKeys, gameRules, sleep } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { type Pairing, filterRound, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
 import { bulkPairing } from '../endpoints';
 import { href } from '../view/util';
+import createClient from 'openapi-fetch';
+import type { paths } from '@lichess-org/types';
 
 interface Tokens {
   [username: string]: string;
@@ -111,6 +113,38 @@ export class BulkNew {
       this.feedback = await responseToFeedback(req);
 
       if (isSuccess(this.feedback)) {
+        if (!!get('armageddon')) {
+          await sleep(3000);
+          const addTimeResponses = new Map<string, number>();
+          for (const game of this.feedback.result.games) {
+            const client = createClient<paths>({
+              baseUrl: this.app.config.lichessHost,
+              headers: {
+                Authorization: `Bearer ${tokens[game.white]}`,
+              },
+            });
+            const resp = await client.POST('/api/round/{gameId}/add-time/{seconds}', {
+              params: {
+                path: {
+                  gameId: game.id,
+                  seconds: 60,
+                },
+              },
+            });
+            addTimeResponses.set(game.id, resp.response.status);
+          }
+
+          const alerts: string[] = [];
+          addTimeResponses.forEach((status, gameId) => {
+            if (status !== 200) {
+              alerts.push(`Failed to add armageddon time to game ${gameId}, status ${status}`);
+            }
+          });
+          if (alerts.length) {
+            alert(alerts.join('\n'));
+          }
+        }
+
         saveUrls(this.feedback.result.id, get('cr-pairings-url'), get('cr-players-url'));
         page(`/endpoint/schedule-games/${this.feedback.result.id}`);
       }
@@ -197,6 +231,10 @@ export class BulkNew {
         ]),
       ]),
       form.clock(),
+      h(
+        'div.form-check.form-switch.mb-3',
+        form.checkboxWithLabel('armageddon', 'Armageddon? (+60 seconds for black)'),
+      ),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games', true)),
       form.variant(),
       form.fen(),

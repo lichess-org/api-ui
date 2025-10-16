@@ -4,8 +4,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@bity/oauth2-auth-code-pkce": "~2.13.0",
+    "@lichess-org/types": "^2.0.86",
     "bootstrap": "~5.3.8",
     "cheerio": "^1.1.2",
+    "openapi-fetch": "^0.15.0",
     "page": "~1.11.6",
     "snabbdom": "~3.6.3"
   },
