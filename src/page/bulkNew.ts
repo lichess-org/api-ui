@@ -3,7 +3,7 @@ import page from 'page';
 import { App } from '../app';
 import type { Me } from '../auth';
 import { type Feedback, formData, isSuccess, responseToFeedback } from '../form';
-import { gameRuleKeys, gameRules, sleep } from '../util';
+import { gameRuleKeys, gameRules } from '../util';
 import * as form from '../view/form';
 import layout from '../view/layout';
 import { type Pairing, filterRound, getPairings, getPlayers, saveUrls } from '../scraper/scraper';
@@ -114,7 +114,6 @@ export class BulkNew {
 
       if (isSuccess(this.feedback)) {
         if (!!get('armageddon')) {
-          await sleep(3000);
           const addTimeResponses = new Map<string, number>();
           for (const game of this.feedback.result.games) {
             const client = createClient<paths>({
