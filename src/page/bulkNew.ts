@@ -232,7 +232,7 @@ export class BulkNew {
       form.clock(),
       h(
         'div.form-check.form-switch.mb-3',
-        form.checkboxWithLabel('armageddon', 'Armageddon? (+60 seconds for black)'),
+        form.checkboxWithLabel('armageddon', 'Armageddon? (+60 seconds for white)'),
       ),
       h('div.form-check.form-switch.mb-3', form.checkboxWithLabel('rated', 'Rated games', true)),
       form.variant(),
