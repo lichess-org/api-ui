@@ -119,7 +119,7 @@ export class BulkNew {
             const client = createClient<paths>({
               baseUrl: this.app.config.lichessHost,
               headers: {
-                Authorization: `Bearer ${tokens[game.white]}`,
+                Authorization: `Bearer ${tokens[game.black]}`,
               },
             });
             const resp = await client.POST('/api/round/{gameId}/add-time/{seconds}', {
